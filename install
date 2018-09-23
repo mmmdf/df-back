@@ -1,0 +1,20 @@
+#!/bin/sh
+
+#
+#
+#
+#
+#
+
+echo Performing install ...
+
+rm -rf public
+ln -s php public
+
+SMARTY=`find . -type d | grep Smarty`
+
+if [ ! "`echo $SMARTY | grep \"./_include/Smarty \"`" ]; then
+  echo ERROR: You must download Smarty and place it in the _include folder
+fi
+
+echo Done.

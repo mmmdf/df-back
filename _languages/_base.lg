@@ -1,0 +1,31 @@
+
+[EN]
+
+g_szTitle = DriveFly
+
+g_szLanguageEnglish = English
+g_szLanguageRomanian = Romana
+
+g_szMenuHome           = Home
+g_szMenuRegister       = Register
+g_szMenuForgotPassword = Forgot password
+g_szMenuLogin          = Login
+g_szMenuLogout         = Logout
+
+g_szCopyright = &copy Copyright 2018 Creative Fish
+
+
+[RO]
+
+g_szTitle = DriveFly
+
+g_szLanguageEnglish = English
+g_szLanguageRomanian = Romana
+
+g_szMenuHome           = Acasa
+g_szMenuRegister       = Inregistrare
+g_szMenuForgotPassword = Recuperare parola
+g_szMenuLogin          = Autentificare
+g_szMenuLogout         = Iesire
+
+g_szCopyright = &copy Copyright 2018 Creative Fish

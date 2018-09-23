@@ -1,0 +1,15 @@
+
+[EN]
+
+szTitle = Home
+
+szTextWelcome = Welcome, 
+szTextNotLoggedIn = You are not logged in!
+
+
+[RO]
+
+szTitle = Acasa
+
+szTextWelcome = Bine ai venit, 
+szTextNotLoggedIn = Nu sunteti autentificat!

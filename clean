@@ -1,0 +1,27 @@
+#!/bin/sh
+
+#
+#
+#
+#
+#
+
+echo Performing clean up ...
+rm -rf `find . | grep \~`
+
+echo Setting folder permissions ...
+chmod 755 `find . -type d`
+
+echo Setting file permissions ...
+chmod 644 `find . -type f`
+
+echo Setting ./clean permissions ...
+chmod 755 clean
+
+echo Setting ./install permissions ...
+chmod 755 install
+
+echo Setting ./backup permissions ...
+chmod 755 backup
+
+echo Done.

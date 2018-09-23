@@ -1,0 +1,37 @@
+
+web-framework - Web Project Base (PHP / Smarty)
+-------------------------------------------------------------------
+
+
+Installation
+-------------------------------------------------------------------
+
+Deployment: Copy _include/Config-1.inc.php-sample to _include/Config-1.inc.php
+and _include/Config-2.inc.php-sample to _include/Config-2.inc.php.
+
+Configuration: Edit _include/Config-1.inc.php and _include/Config-2.inc.php
+for project specific settings.
+
+Database: Import _sql/*.sql into the database defined in Config-2.inc.php.
+
+Apache: Point the URL defined in Config-1.inc.php to php/.
+
+
+Development: Language support
+-------------------------------------------------------------------
+
+Edit the defines in Config-1.inc.php and make sure the defaults match the
+default values for the language fields of the tables admin_sessions and
+admin_users.
+
+Each template has a corresponding language file in the _languages folder,
+matching the folder structure.
+
+
+Development: Template support
+-------------------------------------------------------------------
+
+If the folder containing the template has a _base.tmpl file, then the
+_base.tmpl file will include the required template in the Smarty variable
+called $__main__.
+

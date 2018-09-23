@@ -1,0 +1,16 @@
+#!/bin/sh
+
+#
+#
+#
+#
+#
+
+./clean
+
+echo Performing backup up ...
+
+mkdir -p _backup
+tar cjf _backup/web_framework-`date +%Y.%m.%d-%H.%M`.tar.bz2 CHANGELOG README _documents _include _languages _sql _templates backup clean install php
+
+echo Done.

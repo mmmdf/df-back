@@ -1,0 +1,4 @@
+RewriteEngine on
+
+RewriteRule	^:([A-Z][A-Z])$					index.php?project_language=$1			[L]
+RewriteRule	^:([A-Z][A-Z])/$				index.php?project_language=$1			[L]
