@@ -2,3 +2,21 @@ RewriteEngine on
 
 RewriteRule	^:([A-Z][A-Z])$					index.php?project_language=$1			[L]
 RewriteRule	^:([A-Z][A-Z])/$				index.php?project_language=$1			[L]
+
+RewriteRule	^login$						login.php					[L]
+RewriteRule	^login/$					login.php					[L]
+
+RewriteRule	^logout$					logout.php					[L]
+RewriteRule	^logout/$					logout.php					[L]
+
+RewriteRule	^register$					register.php					[L]
+RewriteRule	^register/$					register.php					[L]
+
+RewriteRule	^activate/([A-Za-z-0-9]+)$			activate.php?code=$1				[L]
+RewriteRule	^activate/([A-Za-z-0-9]+)/$			activate.php?code=$1				[L]
+
+RewriteRule	^forgotpassword$				forgotpassword.php				[L]
+RewriteRule	^forgotpassword/$				forgotpassword.php				[L]
+
+RewriteRule	^reset/([A-Za-z-0-9]+)$				reset.php?code=$1				[L]
+RewriteRule	^reset/([A-Za-z-0-9]+)/$			reset.php?code=$1				[L]

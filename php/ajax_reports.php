@@ -5,7 +5,7 @@
  *   - 
  *
  * Author  : Andrei Gavrila (andrei.gavrila@gmail.com)
- * Date    : 2018.09.02
+ * Date    : 2018.09.20
  * Licence : GPL 2.0
  *
  * Changes :
@@ -36,13 +36,16 @@ if (isset($_POST['airport']) && intval($_POST['airport']) > 0) {
 if (isset($_POST['consolidator']) && intval($_POST['consolidator']) > 0) {
   $tmp0 .= "AND r.consolidatorID = '" . mysql_escape_string(intval($_POST['consolidator'])) . "' ";
 }
+if (isset($_POST['date']) && date('Y-m-d', strtotime($_POST['date'])) ==  $_POST['date']) {
+  $tmp0 .= "AND (r.leavingDate LIKE '" . mysql_escape_string($_POST['date']) . "%' OR r.returnDate LIKE '" . mysql_escape_string($_POST['date']) . "%')";
+}
 
 $reports = $db->query("SELECT r.*, s.name AS _type_name, s.acronym AS _type_acronym, a.name AS _airport_name, a.acronym AS _airport_acronym
-                       FROM reports r 
-					   INNER JOIN service s ON s.id = r.typeID 
+                       FROM reports r
+					   INNER JOIN service s ON s.id = r.typeID
 					   INNER JOIN airport a ON a.id = r.airportID
 					   " . $tmp0 . "
-					   ORDER BY r.created DESC LIMIT 50 ", "id");
+					   ORDER BY r.created DESC LIMIT 0, 50", "id");
 foreach ($reports as $reportIndex => $reportItem) {
   $reports[$reportIndex]['_created_relative'] = relativeTime(strtotime($reportItem['created']));
   $reports[$reportIndex]['_created_formatted'] = date('j M h:i', strtotime($reportItem['created']));
@@ -55,6 +58,11 @@ foreach ($reports as $reportIndex => $reportItem) {
 
 echo json_encode($reports, JSON_PRETTY_PRINT);
 
+/**
+ * Return a relative representation of $time
+ *
+ * Adapted from https://stackoverflow.com/a/7487809
+ */
 function relativeTime($time)
 {
   $intervals = array(

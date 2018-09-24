@@ -49,7 +49,41 @@ body, .btn {
     background-color: #eaeaea!important;
 }
 
+/*modal box from previous site*/
+.smallLabel{
+
+font-size: 10px;
+margin: 0px;
+padding: 0px;
+
+}
+.modal-body hr{
+  border-top: 1px dashed black;
+}
+
+.modal-body .glyphicon-calendar{
+  font-size:18px;
+}
+
+.modal-body .label{
+  font-size : 100%;
+}
+
+.cancel.btn{
+  margin: 20px;
+  opacity: 0.4;
+}
+.cancel.btn:hover{
+  opacity: 1;
+}
+/*end modal box from previous site*/
+
 /* START Loader css */
+
+.loader_container {
+	 margin: 0 auto;
+	 width: 50%;
+}
 
 .lds-roller {
   display: inline-block;
