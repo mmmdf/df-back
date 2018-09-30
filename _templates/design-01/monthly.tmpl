@@ -1,0 +1,651 @@
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+{literal}
+<script type="text/javascript">
+  google.charts.load('current', {'packages':['corechart']});
+  google.charts.setOnLoadCallback(chartLoadedCallback);
+
+  var chartLoaded = false;
+
+  function chartLoadedCallback() {
+    chartLoaded = true;
+  }
+</script>
+{/literal}
+
+<script language="javascript">
+request = {
+  service: '',
+  airport: '',
+  date_year: '',
+  date_month: ''
+};
+
+var chart2Styles = ['color: #A1BF68', 'color: #76A7FA', 'color: #A1BF68', 'color: #3475F6', 'color: #98B761', 'color: #E0B07D', 'color: #76A7FA', 'color: #A1BF68', 'color: #3475F6', 'color: #98B761', 'color: #E0B07D', 'color: #76A7FA', 'color: #A1BF68', 'color: #3475F6', 'color: #98B76', 'color: #E0B07D', 'color: #76A7FA'];
+
+var chartData1 = [];
+var chartData2 = [];
+
+function showChart()
+{
+  if (!chartLoaded) {
+    setTimeout('showChart()', 500);
+
+    return;
+  }
+
+  if (chartData1.length > 1) {
+    var data = google.visualization.arrayToDataTable(chartData1);
+
+    var options = {
+      title: 'Number of Bookings'
+    };
+
+    var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+
+    chart.draw(data, options);
+  }
+
+  if (chartData2.length > 1) {
+    var data = google.visualization.arrayToDataTable(chartData2);
+
+    var options = {
+      title: '&pound; Per Booking if more than 10 bookings',
+      legend: {
+        position: "none"
+      },
+    };
+
+    var chart = new google.visualization.ColumnChart(document.getElementById('columnchart'));
+
+    chart.draw(data, options);
+  }
+}
+
+function refresh()
+{
+  $('.a_container').html($('.loader_container').html());
+
+  $.ajax({
+    url: 'ajax_monthly.php',
+    method: 'post',
+    data: request
+  }).done(function(data) {
+    var list = $($('.list_template').html());
+
+    chart2StyleIndex = 0;
+
+    chartData1 = [['Agent', 'Bookings']];
+    chartData2 = [['Agent', 'Bookings', { role: 'style' }]];
+
+    list.find('.a_total_out').html(data.total.out + ' picks');
+    if (parseInt(data.total.out) + parseInt(data.total.in)) {
+      list.find('.a_total_out').attr('aria-valuenow', (parseInt(data.total.out)*100)/(parseInt(data.total.out) + parseInt(data.total.in)));
+      list.find('.a_total_out').attr('style', 'width: ' + parseInt((parseInt(data.total.out)*100)/(parseInt(data.total.out) + parseInt(data.total.in))) + '%;');
+    } else {
+      list.find('.a_total_out').attr('aria-valuenow', '0');
+      list.find('.a_total_out').attr('style', 'width: 50%;');
+    }
+    list.find('.a_total_in').html(data.total.in + ' drops');
+    if (parseInt(data.total.out) + parseInt(data.total.in)) {
+      list.find('.a_total_in').attr('aria-valuenow', (parseInt(data.total.in)*100)/(parseInt(data.total.out) + parseInt(data.total.in)));
+      list.find('.a_total_in').attr('style', 'width: ' + parseInt((parseInt(data.total.in)*100)/(parseInt(data.total.out) + parseInt(data.total.in))) + '%;');
+    } else {
+      list.find('.a_total_in').attr('aria-valuenow', '0');
+      list.find('.a_total_in').attr('style', 'width: 50%;');
+    }
+
+    for (var consolidatorID in data['reports']) {
+      var item = $($('.list_template_item').html());
+
+      for (var rowIndex in data['reports'][consolidatorID]['rows']) {
+        var row = $($('.list_template_item_row').html());
+
+        row.find('.col').each(function(index, element) {
+          if ($(element).hasClass('a_pound')) {
+            $(element).html('&pound; ' + Number.parseFloat(data['reports'][consolidatorID]['rows'][rowIndex][Object.keys(data['reports'][consolidatorID]['rows'][rowIndex])[index + 1]]).toFixed(2));
+          } else if ($(element).hasClass('a_percent')) {
+            $(element).html(data['reports'][consolidatorID]['rows'][rowIndex][Object.keys(data['reports'][consolidatorID]['rows'][rowIndex])[index + 1]] + '&percnt;');
+          } else {
+            $(element).html(data['reports'][consolidatorID]['rows'][rowIndex][Object.keys(data['reports'][consolidatorID]['rows'][rowIndex])[index + 1]]);
+          }
+        });
+
+        item.find('.a_row').append(row);
+      }
+
+      var head = $($('.list_template_item_head').html());
+
+      head.find('.col').each(function(index, element) {
+        if ($(element).hasClass('a_pound')) {
+          $(element).html('&pound; ' + Number.parseFloat(data['reports'][consolidatorID]['head'][Object.keys(data['reports'][consolidatorID]['head'])[index]]).toFixed(2));
+        } else if ($(element).hasClass('a_percent')) {
+          $(element).html(data['reports'][consolidatorID]['head'][Object.keys(data['reports'][consolidatorID]['head'])[index]] + '&percnt;');
+        } else {
+          $(element).html(data['reports'][consolidatorID]['head'][Object.keys(data['reports'][consolidatorID]['head'])[index]]);
+        }
+      });
+
+      item.find('.a_head').append(head);
+
+      list.find('.a_table_after').before(item);
+
+      chartData1.push([data['reports'][consolidatorID]['head']['_agent'], data['reports'][consolidatorID]['head']['_bookings']]);
+      if (data['reports'][consolidatorID]['head']['_bookings'] >= 10) {
+        chartData2.push([data['reports'][consolidatorID]['head']['_agent'], data['reports'][consolidatorID]['head']['_per_booking'], chart2Styles[chart2StyleIndex]]);
+
+        chart2StyleIndex++;
+      }
+    }
+
+    for (var propertyName in data['totals']) {
+      list.find('.a_data_' + propertyName).each(function(index, element) {
+        if ($(element).hasClass('a_per_booking_pound')) {
+          $(element).html('<span style="font-size:14px;">per booking</span> &pound; ' + Number.parseFloat(data['totals'][propertyName]).toFixed(2));
+        } else if ($(element).hasClass('a_per_booking_pound')) {
+          $(element).html('&pound; ' + Number.parseFloat(data['totals'][propertyName]).toFixed(2));
+        } else {
+          $(element).html(data['totals'][propertyName]);
+        }
+      });
+    }
+
+    $('.a_container').html('');
+    $('.a_container').append(list.html());
+
+    showChart();
+  });
+}
+
+$(document).ready(function() {
+  $('.property_refresh_check').on('change', function(event) {
+    var classList = $(event.currentTarget).attr('class').split(/\s+/);
+    $.each(classList, function(index, item) {
+      if (item.indexOf('property_name_') === 0) {
+        request[item.substr(14)] = $(event.currentTarget).attr('value');
+      }
+    });
+
+    refresh();
+  });
+
+  $('.property_refresh_check').each(function(index, element) {
+    if ($(element).attr('checked') != 'checked') {
+      return;
+    }
+
+    var classList = $(element).attr('class').split(/\s+/);
+    $.each(classList, function(index, item) {
+      if (item.indexOf('property_name_') === 0) {
+        request[item.substr(14)] = $(element).attr('value');
+      }
+    });
+  });
+
+  refresh();
+});
+</script>
+
+<div class="container-fluid">
+    <div class="row py-3">
+        <div class="col-xs-6 col-sm-4 pb-2 pb-sm-0 d-flex justify-content-md-start">
+            <div class="btn-group btn-group-toggle" data-toggle="buttons">
+              <label class="btn btn-secondary active">
+                <input type="radio" name="options" id="option1" autocomplete="off" value="0" class="property_refresh_check property_name_service" checked> ALL
+              </label>
+{foreach from=$services item=_i key=_k}
+              <label class="btn btn-secondary">
+                <input type="radio" name="options" id="option2" autocomplete="off" value="{$_i.id}" class="property_refresh_check property_name_service" /> {$_i.acronym}
+              </label>
+{/foreach}
+            </div>
+        </div>
+
+        <div class="col-xs-6 col-sm-4 pb-2 pb-sm-0 d-flex justify-content-md-center">
+            <div class="btn-group btn-group-toggle" data-toggle="buttons">
+              <label class="btn btn-secondary active">
+                <input type="radio" name="options" id="option1" autocomplete="off" value="0" class="property_refresh_check property_name_airport" checked> ALL
+              </label>
+{foreach from=$airports item=_i key=_k}
+              <label class="btn btn-secondary">
+                <input type="radio" name="options" id="option2" autocomplete="off" value="{$_i.id}" class="property_refresh_check property_name_airport"> {$_i.acronym}
+              </label>
+{/foreach}					  
+            </div>
+        </div>
+
+        <div class="col-sm-4 pb-sm-0 d-flex justify-content-md-end">
+            <div class="btn-group btn-group-toggle" data-toggle="buttons">
+{foreach from=$years item=_i key=_k}
+                <label class="btn btn-secondary{if $_i.selected} active{/if}"><input type="radio" name="options" id="option1" autocomplete="off" value="{$_i.value}" class="property_refresh_check property_name_date_year"{if $_i.selected} checked{/if} > {$_i.label} </label>
+{/foreach}
+            </div>
+        </div>
+    </div>
+        <div class="row pb-3">
+            <div class="offset-md-8 col-sm-4 d-flex justify-content-md-end">
+                <div class="btn-group btn-group-toggle" data-toggle="buttons">
+{foreach from=$months item=_i key=_k}
+                    <label class="btn btn-outline-secondary btn-sm{if $_i.selected} active{/if}"><input type="radio" name="options" id="option1" autocomplete="off" value="{$_i.value}" class="property_refresh_check property_name_date_month"{if $_i.selected} checked{/if}> {$_i.label} </label>
+{/foreach}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+        <div class="container-fluid p-2 bg-light a_container">
+          <div class="row">
+            <div class="col py-3">
+              <div class="progress">
+                <div class="progress-bar bg-success" role="progressbar" style="width: 54.51%" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100">16515 picks</div>
+                <div class="progress-bar bg-info" role="progressbar" style="width: 45.49%" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100">picks 13781 drops</div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col pb-2">
+              <button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">Show/Hide Products</button>
+            </div>
+          </div>
+
+          <div class="row mx-0 py-3 text-muted border-bottom">
+                <div class="col">
+                    Agent
+                </div>
+                <div class="col">
+                    Product
+                </div>
+                <div class="col text-center">
+                    Bookings
+                </div>
+                <div class="col text-center">
+                    Per Booking
+                </div>
+                <div class="col text-center">
+                    Accuracy
+                </div>
+                <div class="col text-right">
+                    Estimate Net
+                </div>
+          </div>
+
+          <div class="row mx-0 accordion" id="accordionExample">
+            <div class="col-md-12 mb-2 py-2 collapse" id="collapseOne" aria-labelledby="headingOne" data-parent="#accordionExample">
+              <div class="row">
+                <div class="col">
+                  Drivefly
+                </div>
+                <div class="col">
+                  LHR D Park&Ride
+                </div>
+                <div class="col text-center">
+                  99
+                </div>
+                <div class="col text-center">
+                  £ 46.64
+                </div>
+                <div class="col text-center">
+                  100%
+                </div>
+                <div class="col text-right">
+                  £ 4742.62
+                </div>
+              </div>
+              <div class="row">
+                <div class="col">
+                  Drivefly
+                </div>
+                <div class="col">
+                  LHR D
+                </div>
+                <div class="col text-center">
+                  305
+                </div>
+                <div class="col text-center">
+                  £ 86.64
+                </div>
+                <div class="col text-center">
+                  100%
+                </div>
+                <div class="col text-right">
+                  £ 3742.62
+                </div>
+              </div>
+              <div class="row">
+                <div class="col">
+                  Drivefly
+                </div>
+                <div class="col">
+                  LHR T
+                </div>
+                <div class="col text-center">
+                  78
+                </div>
+                <div class="col text-center">
+                  £ 76.64
+                </div>
+                <div class="col text-center">
+                  100%
+                </div>
+                <div class="col text-right">
+                  £ 742.62
+                </div>
+              </div>
+            </div>
+            <div class="col-md-12 mb-2 py-2 bg-white" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+              <div class="row">
+                <div class="col">
+                  Drivefly
+                </div>
+                <div class="col">
+                  -
+                </div>
+                <div class="col text-center">
+                  401
+                </div>
+                <div class="col text-center">
+                  £ 860.64
+                </div>
+                <div class="col text-center">
+                  80%
+                </div>
+                <div class="col text-right">
+                  £ 34742.62
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row mx-0 accordion" id="accordionExample">
+            <div class="col-md-12 mb-2 py-2 collapse" id="collapseOne" aria-labelledby="headingOne" data-parent="#accordionExample">
+              <div class="row">
+                <div class="col">
+                  Drivefly
+                </div>
+                <div class="col">
+                  LHR D Park&Ride
+                </div>
+                <div class="col text-center">
+                  99
+                </div>
+                <div class="col text-center">
+                  £ 46.64
+                </div>
+                <div class="col text-center">
+                  100%
+                </div>
+                <div class="col text-right">
+                  £ 4742.62
+                </div>
+              </div>
+              <div class="row">
+                <div class="col">
+                  Drivefly
+                </div>
+                <div class="col">
+                  LHR D
+                </div>
+                <div class="col text-center">
+                  305
+                </div>
+                <div class="col text-center">
+                  £ 86.64
+                </div>
+                <div class="col text-center">
+                  100%
+                </div>
+                <div class="col text-right">
+                  £ 3742.62
+                </div>
+              </div>
+              <div class="row">
+                <div class="col">
+                  Drivefly
+                </div>
+                <div class="col">
+                  LHR T
+                </div>
+                <div class="col text-center">
+                  78
+                </div>
+                <div class="col text-center">
+                  £ 76.64
+                </div>
+                <div class="col text-center">
+                  100%
+                </div>
+                <div class="col text-right">
+                  £ 742.62
+                </div>
+              </div>
+            </div>
+            <div class="col-md-12 mb-2 py-2 bg-white" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+              <div class="row">
+                <div class="col">
+                  Drivefly
+                </div>
+                <div class="col">
+                  -
+                </div>
+                <div class="col text-center">
+                  401
+                </div>
+                <div class="col text-center">
+                  £ 860.64
+                </div>
+                <div class="col text-center">
+                  80%
+                </div>
+                <div class="col text-right">
+                  £ 34742.62
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row mx-0 accordion" id="accordionExample">
+            <div class="col-md-12 mb-2 py-2 collapse" id="collapseOne" aria-labelledby="headingOne" data-parent="#accordionExample">
+              <div class="row">
+                <div class="col">
+                  Drivefly
+                </div>
+                <div class="col">
+                  LHR D Park&Ride
+                </div>
+                <div class="col text-center">
+                  99
+                </div>
+                <div class="col text-center">
+                  £ 46.64
+                </div>
+                <div class="col text-center">
+                  100%
+                </div>
+                <div class="col text-right">
+                  £ 4742.62
+                </div>
+              </div>
+              <div class="row">
+                <div class="col">
+                  Drivefly
+                </div>
+                <div class="col">
+                  LHR D
+                </div>
+                <div class="col text-center">
+                  305
+                </div>
+                <div class="col text-center">
+                  £ 86.64
+                </div>
+                <div class="col text-center">
+                  100%
+                </div>
+                <div class="col text-right">
+                  £ 3742.62
+                </div>
+              </div>
+              <div class="row">
+                <div class="col">
+                  Drivefly
+                </div>
+                <div class="col">
+                  LHR T
+                </div>
+                <div class="col text-center">
+                  78
+                </div>
+                <div class="col text-center">
+                  £ 76.64
+                </div>
+                <div class="col text-center">
+                  100%
+                </div>
+                <div class="col text-right">
+                  £ 742.62
+                </div>
+              </div>
+            </div>
+            <div class="col-md-12 mb-2 py-2 bg-white" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+              <div class="row">
+                <div class="col">
+                  Drivefly
+                </div>
+                <div class="col">
+                  -
+                </div>
+                <div class="col text-center">
+                  401
+                </div>
+                <div class="col text-center">
+                  £ 860.64
+                </div>
+                <div class="col text-center">
+                  80%
+                </div>
+                <div class="col text-right">
+                  £ 34742.62
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row mx-0 accordion" id="accordionExample">
+            <div class="col-md-12 mb-2 py-2 bg-white">
+              <div class="row" style="font-size: 20px; font-weight: bold;">
+                <div class="col">
+                </div>
+                <div class="col">
+                </div>
+                <div class="col text-center">
+                  6136
+                </div>
+                <div class="col text-center">
+                  <span style="font-size:14px;">per booking</span> £ 69.12</td>
+                </div>
+                <div class="col text-center">
+                </div>
+                <div class="col text-right">
+                  £ 424105.2
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-12 bg-white mt-2">
+            <div class="row">
+              <div class="col">
+                <div id="piechart" style="width: 100%; height: 800px;"></div>
+              </div>
+              <div class="col d-flex align-items-center">
+                <div id="columnchart" style="width: 100%; height: 400px;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+<div class="loader_container" style="display: none;">
+<div class="row mx-0 py-3 text-muted border-bottom">
+	<div style="margin: 0 auto; color: #777" class="text-center">
+		<div class="lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+		<div style="margin-bottom: 24px; font-size: 36px; line-height: 40px; font-weight: 900">One moment please</div>
+		<p>We are looking for results using your criteria.</p>
+	</div>
+</div>
+</div>
+
+<div class="list_template" style="display: none;">
+    <div>
+        <div class="row">
+            <div class="col py-3">
+                <div class="progress">
+                    <div class="progress-bar bg-success a_total_out" role="progressbar" style="width: 50%" aria-valuenow="" aria-valuemin="0" aria-valuemax="100">0 picks</div>
+                    <div class="progress-bar bg-info a_total_in" role="progressbar" style="width: 50%" aria-valuenow="" aria-valuemin="0" aria-valuemax="100">0 drops</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col pb-2">
+                <button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">Show/Hide Products</button>
+            </div>
+        </div>
+
+        <div class="row mx-0 py-3 text-muted border-bottom">
+            <div class="col">Agent</div>
+            <div class="col">Product</div>
+            <div class="col text-center">Bookings</div>
+            <div class="col text-center">Per Booking</div>
+            <div class="col text-center">Accuracy</div>
+            <div class="col text-right">Estimate Net</div>
+        </div>
+
+        <div class="row mx-0 accordion a_table_after" id="accordionExample">
+            <div class="col-md-12 mb-2 py-2 bg-white">
+                <div class="row" style="font-size: 20px; font-weight: bold;">
+                    <div class="col"></div>
+                    <div class="col"></div>
+                    <div class="col text-center a_data_bookings">&nbsp;</div>
+                    <div class="col text-center a_data_per_booking a_per_booking_pound">&nbsp;</div>
+                    <div class="col text-center"></div>
+                    <div class="col text-right a_data_estimate_net a_pound">&nbsp;</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-12 bg-white mt-2">
+            <div class="row">
+                <div class="col"><div id="piechart" style="width: 100%; height: 800px;"></div></div>
+                <div class="col d-flex align-items-center"><div id="columnchart" style="width: 100%; height: 400px;"></div></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="list_template_item" style="display: none;">
+    <div class="row mx-0 accordion" id="accordionExample">
+        <div class="col-md-12 mb-2 py-2 collapse a_row" id="collapseOne" aria-labelledby="headingOne" data-parent="#accordionExample"></div>
+        <div class="col-md-12 mb-2 py-2 bg-white a_head" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne"></div>
+    </div>
+</div>
+
+<div class="list_template_item_row" style="display: none;">
+    <div class="row">
+        <div class="col">&nbsp;</div>
+        <div class="col">&nbsp;</div>
+        <div class="col text-center"></div>
+        <div class="col text-center a_pound"></div>
+        <div class="col text-center a_percent_removed_to_be_calculated"></div>
+        <div class="col text-right a_pound"></div>
+    </div>
+</div>
+
+<div class="list_template_item_head" style="display: none;">
+    <div class="row">
+        <div class="col">&nbsp;</div>
+        <div class="col">&nbsp;</div>
+        <div class="col text-center"></div>
+        <div class="col text-center a_pound"></div>
+        <div class="col text-center a_percent_removed_to_be_calculated"></div>
+        <div class="col text-right a_pound"></div>
+    </div>
+</div>

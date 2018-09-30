@@ -23,6 +23,49 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/js/tempusdominus-bootstrap-4.min.js"></script>	
+
+    <script>
+$(document).ready(function() {
+  $('.a_search_close').on('click', function(e) {
+    $('.a_search_container').hide();
+  });
+
+  $('.trigger_search').on('click', function(e) {
+    $.ajax({
+      url: 'ajax_search.php',
+      method: 'post',
+      data: { search: $('.data_search').val() }
+    }).done(function(data) {
+      $('.a_table_search').find('tbody').html('');
+
+      for (var reportIndex in data) {
+        var item = $($('.template_search').html());
+
+        for (var reportProperty in data[reportIndex]) {
+          item.find('.data_' + reportProperty).each(function(index, element) {
+            $(element).html(data[reportIndex][reportProperty]);
+          });
+        }
+
+        item.find('.data_color_selector_payment').each(function(index, element) {
+          switch (data[reportIndex]['payment']) {
+            case 'OK': $(element).addClass('badge-success'); break;
+            case 'Paid': $(element).addClass('badge-success'); break;
+		    case 'Ammended': $(element).addClass('badge-success'); break;
+            case 'Pending': $(element).addClass('badge-warning'); break;
+            case 'Cancelled': $(element).addClass('badge-danger'); break;
+            default: $(element).addClass('bg-white');
+          }
+        });
+
+        $('.a_table_search').find('tbody').append(item.find('tr'));
+      }
+
+      $('.a_search_container').show();
+    });
+  });
+});
+    </script>
   </head>
   <body>
 	 <nav class="navbar navbar-expand-md bg-light navbar-light shadow-sm px-sm-0">
@@ -38,13 +81,13 @@
 				<a class="nav-link" href="/daily.php">Daily</a>
 			  </li>
 			  <li class="nav-item mx-2">
-				<a class="nav-link" href="/stats.html">Stats</a>
+				<a class="nav-link" href="/stats.php">Stats</a>
 			  </li>
 			  <li class="nav-item mx-2">
-				<a class="nav-link" href="levels.html">Levels</a>
+				<a class="nav-link" href="levels.php">Levels</a>
 			  </li>
 			  <li class="nav-item mx-2">
-				<a class="nav-link" href="monthly.html">Monthly</a>
+				<a class="nav-link" href="monthly.php">Monthly</a>
 			  </li>
 			  <li class="nav-item dropdown mx-2">
 				<a class="nav-link dropdown-toggle" href="https://example.com" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Other</a>
@@ -59,11 +102,11 @@
 			  </li>
 			</ul>
 			<div class="d-inline-flex">
-				<form class="form-inline my-2 my-lg-0 mx-2">
+				<form class="form-inline my-2 my-lg-0 mx-2" onsubmit="return false;">
 					<div class="input-group">
-					  <input class="form-control" type="text" placeholder="Search">
-					  <div class="input-group-append"> 
-						  <button class="btn btn-outline-secondary" type="submit">Search</button> 
+					  <input class="form-control data_search" type="text" placeholder="Search">
+					  <div class="input-group-append">
+						  <button class="btn btn-outline-secondary trigger_search">Search</button>
 					  </div>
 					</div>
 				</form>
@@ -82,7 +125,51 @@
 		  </div>
 		</div>
 	</nav>
-	
+
+    <div id="search-result" class="panel panel-default a_search_container" style="display: none;">
+        <div class="panel-heading">
+            <button type="button" class="close a_search_close"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+            <h3 class="panel-title text-center">Search Result</h3>
+        </div>
+        <div class="panel-body" style="background: rgba(241, 189, 189, 0.75);">
+            <small>You can search by: id, reference, name, mobile and vehicle registration </small> 
+            <hr>
+            <div>
+                <table class="table a_table_search">
+                    <tbody>
+                        <tr class="pointer">
+                            <td><span class="label label-default">1 Feb 2019</span></td>
+                            <td><span class="label label-default">3 Feb 2019</span></td>
+                            <td><span class="label label-default">L4P</span><span class="label label-info">F</span></td>
+                            <td><span class="label label-default">L4R-1-2199353</span></td>
+                            <td><span class="label label-default">Birmingham</span></td>
+                            <td>Monika K?pka</td>
+                            <td>BD06UZA</td>
+                            <td><span class="label label-success">OK</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="template_search" style="display: none;">
+        <table class="table">
+            <tbody>
+                <tr class="pointer">
+                    <td><span class="badge badge-secondary data__leavingDate_formatted">&nbsp;</span></td>
+                    <td><span class="badge badge-secondary data__returnDate_formatted" >&nbsp;</span></td>
+                    <td><span class="badge badge-secondary data__consolidator_name">&nbsp;</span> <span class="badge badge-primary data_product">&nbsp;</span></td>
+                    <td><span class="badge badge-secondary data_refNum">&nbsp;</span></td>
+                    <td><span class="badge badge-secondary data__airport_name">&nbsp;</span></td>
+                    <td class="data__name">&nbsp;</td>
+                    <td class="data_carReg">&nbsp;</td>
+                    <td><span class="badge badge-pill data_color_selector_payment data_payment">&nbsp;</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
 {$__main__}
 
     <script type="text/javascript">

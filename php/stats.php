@@ -1,15 +1,14 @@
 <?php
 
 /*
- * daily.php
+ * stats.php
  *   - 
  *
  * Author  : Andrei Gavrila (andrei.gavrila@gmail.com)
- * Date    : 2009.03.01
+ * Date    : 2018.09.29
  * Licence : GPL 2.0
  *
  * Changes :
- *   - [2011.02.13] - Andrei Gavrila - Upgrade to Smarty 3
  *   - []
  */
 
@@ -33,7 +32,7 @@ $html->assign('airports', $airports);
 $consolidators = $db->query("SELECT * FROM consolidator", "id");
 $html->assign('consolidators', $consolidators);
 
-$html->tDisplay('daily.tmpl', $session['language']);
+$html->tDisplay('stats.tmpl', $session['language']);
 
 function smarty_function_md5_rand($params, &$smarty)
 {

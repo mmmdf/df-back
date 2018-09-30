@@ -154,7 +154,9 @@ $(document).ready(function() {
       refresh();
     }
   });
- 
+
+// caca starts
+  
   $('#editReportModal').on('show.bs.modal', function (event) {
     var button = $(event.relatedTarget) // Button that triggered the modal
     var recipient = button.data('report-id') // Extract info from data-* attributes
@@ -163,6 +165,11 @@ $(document).ready(function() {
     var modal = $(this)
     modal.find('.modal-title').text('New message to ' + recipient)
   });
+//  $( "#date_date" ).on('click', function() {
+//    $('#datetimepickerHidden').datetimepicker('toggle');
+//  });
+
+// caca ends
 
   $('#datetimepickerHidden').datetimepicker({
     defaultDate: new Date(),
@@ -258,6 +265,14 @@ $(document).ready(function() {
                 <button id="date_forw" class="btn btn-secondary"><i class="fas fa-step-forward"></i></button>
             </div>
         </div>
+    </div>
+    <div class="row pb-3">
+      <div class="offset-md-3 col-md-6 d-flex justify-content-md-center">
+        <h2><script> document.write(new Date().toDateString()); </script> (Today)</h2>
+      </div>
+      <div class="col-md-3 d-flex justify-content-md-end">
+        <button type="button" class="btn btn-primary">Print AM/PM</button>
+      </div>
     </div>
 </div>
 
