@@ -14,6 +14,7 @@
  *   - [2006.02.28] - Andrei Gavrila - Added language support
  *   - [2011.02.13] - Andrei Gavrila - Upgrade to Smarty 3
  *   - [2011.02.13] - Andrei Gavrila - Upgrade to PHP5 class style (constructor)
+ *   - [2018.09.20] - Andrei Gavrila - Upgrade to Smarty 3.1.33 (template_dir, config_dir are now arrays)
  *   - []
  */
 
@@ -29,10 +30,10 @@ class CTemplate extends Smarty {
       mkdir($tmp . '/compile');
     }
 
-    $this->template_dir = PROJECT_PATH . '/_templates/' . PROJECT_THEME . '/';
-    $this->config_dir   = PROJECT_PATH . '/_languages/';
-    $this->cache_dir    = $tmp . '/cache/';
-    $this->compile_dir  = $tmp . '/compile/';
+    $this->template_dir[0] = PROJECT_PATH . '/_templates/' . PROJECT_THEME . '/';
+    $this->config_dir[0]   = PROJECT_PATH . '/_languages/';
+    $this->cache_dir       = $tmp . '/cache/';
+    $this->compile_dir     = $tmp . '/compile/';
 
     $this->config_overwrite = false;
 
@@ -51,11 +52,11 @@ class CTemplate extends Smarty {
      * Load the language file
      */
 
-    if (is_file($this->config_dir . '/' . substr($szTemplate, 0, -5) . '.lg')) {
+    if (is_file($this->config_dir[0] . '/' . substr($szTemplate, 0, -5) . '.lg')) {
       $this->configLoad(substr($szTemplate, 0, -5) . '.lg', $language);
     }
 
-    $__main__ = $this->fetch($this->template_dir . $szTemplate);
+    $__main__ = $this->fetch($this->template_dir[0] . $szTemplate);
     $this->assign('__main__', $__main__);
 
     /*
@@ -64,8 +65,8 @@ class CTemplate extends Smarty {
      */
 
     if (strrpos($szTemplate, '/') !== FALSE) {
-      if (is_file($this->template_dir . '/' . substr($szTemplate, 0, strrpos($szTemplate, '/')) . '/_base.tmpl')) {
-        if (is_file($this->config_dir . '/' . substr($szTemplate, 0, strrpos($szTemplate, '/')) . '/_base.lg')) {
+      if (is_file($this->template_dir[0] . '/' . substr($szTemplate, 0, strrpos($szTemplate, '/')) . '/_base.tmpl')) {
+        if (is_file($this->config_dir[0] . '/' . substr($szTemplate, 0, strrpos($szTemplate, '/')) . '/_base.lg')) {
           $this->configLoad(substr($szTemplate, 0, strrpos($szTemplate, '/')) . '/_base.lg', $language);
         }
 
@@ -74,8 +75,8 @@ class CTemplate extends Smarty {
         print($__main__);
       }
     } else {
-      if (is_file($this->template_dir . '/_base.tmpl')) {
-        if (is_file($this->config_dir . '/_base.lg')) {
+      if (is_file($this->template_dir[0] . '/_base.tmpl')) {
+        if (is_file($this->config_dir[0] . '/_base.lg')) {
           $this->configLoad('_base.lg', $language);
         }
 

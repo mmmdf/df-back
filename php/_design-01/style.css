@@ -78,6 +78,11 @@ padding: 0px;
 }
 /*end modal box from previous site*/
 
+.pointer {
+	cursor: pointer;
+}
+
+
 /* START Loader css */
 
 .loader_container {

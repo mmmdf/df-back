@@ -1,28 +1,25 @@
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml">
+ <!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
   <head>
-    <meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1" />
-
     <title>{#g_szTitle#}</title>
 
     <base href="{$smarty.const.PROJECT_URL}" />
     <meta charset="utf-8">
-
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="_design-01/style.css" >
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/css/tempusdominus-bootstrap-4.min.css" />
-
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
+	
     <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js" type="text/javascript"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/js/tempusdominus-bootstrap-4.min.js"></script>	
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/js/tempusdominus-bootstrap-4.min.js"></script>	
 
     <script>
 $(document).ready(function() {
@@ -47,22 +44,131 @@ $(document).ready(function() {
           });
         }
 
-        item.find('.data_color_selector_payment').each(function(index, element) {
-          switch (data[reportIndex]['payment']) {
+        item.find('.data_color_selector_status').each(function(index, element) {
+          switch (data[reportIndex]['status']) {
             case 'OK': $(element).addClass('badge-success'); break;
             case 'Paid': $(element).addClass('badge-success'); break;
-		    case 'Ammended': $(element).addClass('badge-success'); break;
+		    case 'Amended': $(element).addClass('badge-success'); break;
             case 'Pending': $(element).addClass('badge-warning'); break;
             case 'Cancelled': $(element).addClass('badge-danger'); break;
             default: $(element).addClass('bg-white');
           }
         });
-
-        $('.a_table_search').find('tbody').append(item.find('tr'));
+        
+		item.find('tr').attr('data-report-id', data[reportIndex]['id']);
+        
+		$('.a_table_search').find('tbody').append(item.find('tr'));
       }
 
       $('.a_search_container').show();
     });
+  });
+  
+  $('#editReportModal').on('show.bs.modal', function (event) {
+    $('#editReportModal').find('.modal-content > div').each(function(index, element) {
+      if ($(element).hasClass('modal-loader')) {
+        $(element).show();
+      } else {
+        $(element).hide();
+      }
+    });
+
+    $.ajax({
+      url: 'ajax_report.php',
+      method: 'post',
+      data: { report: $(event.relatedTarget).data('report-id') }
+    }).done(function(data){
+      for (var reportProperty in data) {
+        $('#editReportModal').find('.data_' + reportProperty).each(function(index, element) {
+          if ($(element).is('input') || $(element).is('textarea')) {
+            $(element).val(data[reportProperty]);
+          } else {
+            $(element).html(data[reportProperty]);
+          }
+        });
+      }
+
+	  $('#editReportModal').find('.data_color_selector_status').each(function(index, element) {
+        switch (data['status']) {
+          case 'OK': $(element).addClass('badge-success'); $(element).removeClass('badge-warning badge-danger'); break;
+          case 'Paid': $(element).addClass('badge-success'); $(element).removeClass('badge-warning badge-danger'); break;
+		  case 'Amended': $(element).addClass('badge-success'); $(element).removeClass('badge-warning badge-danger'); break;
+          case 'Pending': $(element).addClass('badge-warning'); $(element).removeClass('badge-success badge-danger'); break;
+          case 'Cancelled': $(element).addClass('badge-danger'); $(element).removeClass('badge-warning badge-success'); break;
+          default: $(element).addClass('bg-white');
+        }
+      });
+
+      $('#editReportModal').find('.modal-content > div').each(function(index, element) {
+        if ($(element).hasClass('modal-loader')) {
+          $(element).hide();
+        } else {
+          $(element).show();
+        }
+      });
+
+      $('#leaving_datepicker').val(data['_leavingDate_formatted']);
+      $('[data-target="#leaving_time"]').val(data['_leavingDate_additional']);
+      $('#returning_datepicker').val(data['_returnDate_formatted']);
+      $('[data-target="#returning_time"]').val(data['_returnDate_additional']);
+
+      $('#editReportModal .button-save').off('click');
+
+      $('#editReportModal .button-save').on('click', function(event) {
+        var properties = {};
+        var invalid = false;
+
+        $('#editReportModal').find('.save-data').each(function(index, element) {
+          var classList = $(element).attr('class').split(/\s+/);
+          $.each(classList, function(index, item) {
+            if (item.indexOf('save-data-property-') === 0) {
+              properties[item.substr(19)] = $(element).val();
+
+              invalid = invalid || !element.checkValidity();
+            }
+          });
+        });
+
+        properties['leavingDate'] = moment(properties['leavingDate1'] + ' ' + properties['leavingDate2'], 'D/M/YYYY h:m A').format('YYYY-MM-DD HH:mm:ss');
+        properties['returnDate'] = moment(properties['returnDate1'] + ' ' + properties['returnDate2'], 'D/M/YYYY h:m A').format('YYYY-MM-DD HH:mm:ss');
+
+        if (!invalid) {
+          $('#editReportModal').find('.modal-content > div').each(function(index, element) {
+            if ($(element).hasClass('modal-loader')) {
+              $(element).show();
+            } else {
+              $(element).hide();
+            }
+          });
+
+          $.ajax({
+            url: 'ajax_report_save.php',
+            method: 'post',
+            data: properties
+          }).done(function(data) {
+            $('#editReportModal').modal('hide');
+
+            refresh();
+          });
+        }
+      });
+    });
+  });
+  
+  $('#leaving_datepicker').datetimepicker({
+    format: 'DD/MM/YYYY'
+  });
+
+  $('#returning_datepicker').datetimepicker({
+    format: 'DD/MM/YYYY'
+  });
+
+  $('#leaving_time').datetimepicker({
+    format: 'LT'
+  });
+
+  $('#returning_time').datetimepicker({
+    format: 'LT'
   });
 });
     </script>
@@ -70,7 +176,7 @@ $(document).ready(function() {
   <body>
 	 <nav class="navbar navbar-expand-md bg-light navbar-light shadow-sm px-sm-0">
 		<div class="container-fluid">
-			<a class="navbar-brand" href="#"><i class="fa d-inline fa-lg fa-plane"></i><b> rishi2</b></a>
+			<a class="navbar-brand" href="#"><i class="fa d-inline fa-lg fa-plane"></i><strong> rishi2</strong></a>
 			<button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbar2SupportedContent"> <span class="navbar-toggler-icon"></span> </button>
 		  <div class="collapse navbar-collapse justify-content-between" id="navbar2SupportedContent">
 			<ul class="navbar-nav">
@@ -94,8 +200,8 @@ $(document).ready(function() {
 				<div class="dropdown-menu" aria-labelledby="dropdown01">
 				  <a class="dropdown-item" href="daily-without-terminal.html">Daily without terminal</a>
 				  <a class="dropdown-item" href="price.html">Price</a>
-				  <a class="dropdown-item" href="products.html">Products</a>
-				  <a class="dropdown-item" href="xtrapayments.html">Extra payments</a>
+				  <a class="dropdown-item" href="products.php">Products</a>
+				  <a class="dropdown-item" href="extra_payments.php">Extra payments</a>
 				  <a class="dropdown-item" href="alerts.html">Alerts</a>
 				  <a class="dropdown-item" href="log.html">Logs</a>
 				</div>
@@ -128,7 +234,7 @@ $(document).ready(function() {
 
     <div id="search-result" class="panel panel-default a_search_container" style="display: none;">
         <div class="panel-heading">
-            <button type="button" class="close a_search_close"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+            <button type="button" class="close a_search_close"><span aria-hidden="true">x</span><span class="sr-only">Close</span></button>
             <h3 class="panel-title text-center">Search Result</h3>
         </div>
         <div class="panel-body" style="background: rgba(241, 189, 189, 0.75);">
@@ -156,7 +262,7 @@ $(document).ready(function() {
     <div class="template_search" style="display: none;">
         <table class="table">
             <tbody>
-                <tr class="pointer">
+                <tr class="pointer" data-toggle="modal" data-target="#editReportModal" data-report-id="">
                     <td><span class="badge badge-secondary data__leavingDate_formatted">&nbsp;</span></td>
                     <td><span class="badge badge-secondary data__returnDate_formatted" >&nbsp;</span></td>
                     <td><span class="badge badge-secondary data__consolidator_name">&nbsp;</span> <span class="badge badge-primary data_product">&nbsp;</span></td>
@@ -164,7 +270,7 @@ $(document).ready(function() {
                     <td><span class="badge badge-secondary data__airport_name">&nbsp;</span></td>
                     <td class="data__name">&nbsp;</td>
                     <td class="data_carReg">&nbsp;</td>
-                    <td><span class="badge badge-pill data_color_selector_payment data_payment">&nbsp;</span></td>
+                    <td><span class="badge badge-pill data_color_selector_status data_status">&nbsp;</span></td>
                 </tr>
             </tbody>
         </table>
@@ -172,7 +278,296 @@ $(document).ready(function() {
 
 {$__main__}
 
-    <script type="text/javascript">
+<!-- Modal -->
+<div class="modal fade" id="editReportModal" tabindex="-1" role="dialog" aria-labelledby="editReportModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+
+		<div class="modal-content">
+			<div class="modal-loader" style="display: none;">
+				<div style="margin: 36px 0; color: #777; padding-top: 1rem;" class="text-center">
+					<div class="lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+					<div style="margin-bottom: 24px; font-size: 36px; line-height: 40px; font-weight: 900">One moment please</div>
+					<p>We are loading your entry details.</p>
+				</div>
+			</div>
+
+			<div class="modal-header">
+				<div class="col-md-8 p-0">
+					<h5 class="modal-title" id="editReportModalLabel"> <span class="data__name">Christopher Pullen</span> | <span class="data_mobile">07942679346</span> </h5>
+				</div>
+				<div class="col-md-4 p-0 d-flex justify-content-end">
+					<h5>Ref:  <span class="badge badge-secondary data_refNum">DDFH750652</span></h5>
+				</div>
+			</div>
+
+			<div class="modal-body">
+			    <input type="hidden" class="data_id save-data save-data-property-id" />
+				<ul id="edit_Report_Tab" class="nav nav-tabs nav-justified" role="tablist">
+					<li class="nav-item"><a class="nav-link active" data-toggle="tab" href="#booking_details" role="tab" aria-controls="booking_details" aria-selected="true">Booking details</a></li>
+					<li class="nav-item"><a class="nav-link" data-toggle="tab" href="#amendments" role="tab" aria-controls="amendments" aria-selected="true">Amendments</a></li>
+					<li class="nav-item"><a class="nav-link" data-toggle="tab" href="#photos" role="tab" aria-controls="photos" aria-selected="true">Photos</a></li>
+					<li class="nav-item"><a class="nav-link" data-toggle="tab" href="#payments" role="tab" aria-controls="payments" aria-selected="true">Payments</a></li>
+				</ul>
+				<div id="edit_Report_Tab_Content" class="tab-content">
+					<div title="Booking details" class="tab-pane am-fade show active" style="margin-top: 15px;" id="booking_details" role="tabpanel">
+						<div class="row pt-2">
+							<div class="col-md-3">
+								<div class="smallLabel pb-1">Flying from</div>  
+								<span class="badge badge-secondary p-2 data__airport_name">Heathrow</span>
+								<span class="span-tooltip glyphicon glyphicon-edit  pull-right pointer" data-toggle="tooltip" aria-hidden="true" title="Edit name"></span>
+							</div>
+							<div class="col-md-6">
+								<div class="smallLabel">Leaving on</div>    
+								<div class="input-group date pr-2">
+									<input type="text" class="form-control datetimepicker-input save-data save-data-property-leavingDate1" id="leaving_datepicker" placeholder="dd/mm/yyyy" data-toggle="datetimepicker" data-target="#leaving_datepicker">
+								</div>
+							</div>
+							<div class="col-md-3">
+								<div class="smallLabel text-white">&nbsp;</div>
+								<div class="form-group">
+									<div class="input-group date" id="leaving_time" data-target-input="nearest">
+										<input type="text" class="form-control datetimepicker-input save-data save-data-property-leavingDate2" data-target="#leaving_time" placeholder="hh:mm"/>
+										<div class="input-group-append" data-target="#leaving_time" data-toggle="datetimepicker">
+											<div class="input-group-text"><i class="fas fa-clock"></i></div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-md-3">
+								<div class="smallLabel pb-1">Type</div>
+								<span class=""> 
+									<span class="badge badge-info p-2 data__type_name" >Meet &amp; Greet</span>
+									<span class="span-tooltip glyphicon glyphicon-edit  pull-right pointer" aria-hidden="true" data-toggle="tooltip" title="Edit"></span>
+								</span>
+							</div>
+							<div class="col-md-6">
+								<div class="smallLabel">Returning on</div>   
+								<div class="input-group date pr-2">
+									<input type="text" class="form-control datetimepicker-input save-data save-data-property-returnDate1" id="returning_datepicker" placeholder="dd/mm/yyyy" data-toggle="datetimepicker" data-target="#returning_datepicker">
+								</div>
+							</div>
+							<div class="col-md-3">
+								<div class="smallLabel text-white">&nbsp;</div>
+								<div class="form-group">
+									<div class="input-group date" id="returning_time" data-target-input="nearest">
+										<input type="text" class="form-control datetimepicker-input save-data save-data-property-returnDate2" data-target="#returning_time" placeholder="hh:mm"/>
+										<div class="input-group-append" data-target="#returning_time" data-toggle="datetimepicker">
+											<div class="input-group-text"><i class="fas fa-clock"></i></div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="dropdown-divider"></div>
+
+						<div class="row">
+						   <div class="col-md-4">
+								  <div class="smallLabel">Car Make and Model</div>  
+								  <input maxlength="25" type="text" name="carModel" class="form-control data_carModel save-data save-data-property-carModel" value="" pattern="[A-Za-z0-9 ]+" title="">
+						   </div>
+						   <div class="col-md-4">
+								  <div class="smallLabel">Car Colour</div>  
+								  <input maxlength="12" type="text" name="carColor" class="form-control data_carColour save-data save-data-property-carColour" value="" pattern="[A-Za-z ]+" title="">
+						   </div>
+						   <div class="col-md-4">
+								  <div class="smallLabel">Reg Number</div>  
+								  <input maxlength="10" type="text" name="carReg" class="form-control text-center data_carReg save-data save-data-property-carReg" value="" pattern="[A-Za-z0-9 ]+" title="">
+						   </div>
+					   </div>
+
+					   <div class="dropdown-divider"></div>
+
+					   <div class="row">
+						   <div class="col-md-4">
+								  <div class="smallLabel">Returning Flight Number</div>  
+								  <input maxlength="10" type="text" name="flightEnd" class="form-control text-center data_returnFlightNum save-data save-data-property-returnFlightNum" pattern="{literal}[A-Z]{2}[0-9]{1,}{/literal}" autocomplete="off">
+						   </div>
+						   <div class="col-md-4">
+								  <div class="smallLabel">Terminal In</div>  
+								  <input maxlength="11" type="text" name="terminalEnd" class="form-control text-center data_terminal_in save-data save-data-property-terminal_in" value="" pattern="{literal}[A-Za-z0-9]{1,}{/literal}" title="" autocomplete="off">
+						   </div>
+						   <div class="col-md-4">
+								  <div class="smallLabel">Terminal Out</div> 
+								  <input maxlength="11" type="text" name="terminalStart" class="form-control text-center data_terminal_out save-data save-data-property-terminal_out" value="" pattern="{literal}[A-Za-z0-9]{1,}{/literal}" title="" autocomplete="off">
+						   </div>
+					   </div>
+
+					  <div class="dropdown-divider"></div>
+
+					   <div class="row">
+						   <div class="col-md-4">
+							   <div class="row">
+								  <div class="col-md-6">
+									<div class="smallLabel">Amount:</div>
+									<div><span class="badge badge-secondary text-lg  p-1">&pound; 54.80</span></div>
+									<div><span class="badge badge-secondary text-lg  p-1">&pound; 68.50</span></div>
+									<div><span class="badge badge-info  p-1">save 20</span></div>
+								  </div>
+								  <div class="col-md-6">
+									<div class="smallLabel">Via:</div>
+									<span class="badge badge-warning data__consolidator_name">DriveFly</span>
+									<span class="badge badge-info p-1 data_product">D</span>
+								  </div>
+							   </div>
+							   <div class="row">
+								<div class="col-md-12">
+								  <button type="button" class="cancel btn btn-danger mx-0 mt-3">Cancel booking</button>               
+								</div>
+							   </div>     
+						   </div>
+
+						   <div class="col-md-8">
+								  <textarea maxlength="255" rows="5" class="form-control save-data save-data-property-notes data_notes"></textarea>
+								  <div class="smallLabel ">Admin: super admin</div>
+						   </div>
+					   </div>
+
+					   <div class="dropdown-divider"></div>
+
+					   <div class="row">
+						  <div class="col-md-6">
+							<span>Status: <span class="badge p-2 data_color_selector_status data_status">OK</span></span>
+						  </div>
+						  <div class="col-md-6 text-right">
+							<small>Created:  <span class="data__created_formatted">05 Sep 10:46</span></small> | <small>Updated: <span class="data__lastUpdate_formatted">05 Sep 10:46</span></small>
+						  </div>
+					   </div>        
+					</div>
+			
+					<div title="Amendments" class="tab-pane am-fade" id="amendments" role="tabpanel">
+						<table class="table table-condensed"  style="margin-top: 15px;">
+							<tbody>
+								<tr class="">
+									<td class="">2018-09-23 10:17:32<br><br>DDFHPR</td>
+									<td>
+										<table class="table table-condensed">
+											<tbody><tr><th>field</th><th>before</th><th>after</th></tr>
+											<tr class="">
+											   <td class="">notes</td>
+											   <td class=""></td>
+											   <td class="">Customer left his rack sack in the bus. He told us to to deliver it and will pay for the delivery cost. He will call us back on Monday morning.</td>
+					
+											</tr>
+											</tbody>
+										</table>
+									</td>
+								</tr>
+								<tr class="">
+					
+									<td class="">2018-09-10 17:33:33<br><br>DDFHPR</td>
+									<td>
+										<table class="table table-condensed">
+											<tbody><tr><th>field</th><th>before</th><th>after</th></tr>
+											<tr class="">
+											   <td class="">ppl</td>
+											   <td class="">0</td>
+											   <td class="">2</td>
+											</tr>
+											<tr class="">
+											   <td class="">ppl2</td>
+											   <td class=""></td>
+											   <td class="">2</td>
+											</tr>
+											</tbody>
+										</table>
+									</td>
+								</tr>
+								<tr class="">
+									<td class="">2018-09-10 11:43:18<br><br>DDFHPR</td>
+									<td>
+										<table class="table table-condensed">
+											<tbody><tr><th>field</th><th>before</th><th>after</th></tr>
+												<tr class="">
+													<td class="">terminal_out</td>
+													<td class="">LHR3</td>
+													<td class="">3</td>
+												</tr>
+												<tr class="">
+													<td class="">terminal_in</td>
+													<td class="">LHR3</td>
+													<td class="">3</td>
+												</tr>
+											</tbody>
+										</table>
+								   </td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+            
+					<div title="Photos" class="tab-pane am-fade" id="photos" role="tabpanel">
+						<div class="row" style="margin-top: 15px;">
+							<div class="custom-file">
+								<input type="file" class="custom-file-input" id="customFile">
+								<label class="custom-file-label" for="customFile">Choose file</label>
+							</div>
+						</div>
+
+						<div class="row">
+							<div class="progress" style="margin-bottom:0">
+								<div class="progress-bar " role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+							</div>
+						</div>
+						<div class="progress" style="margin-bottom:0">
+							<div class="progress-bar " role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+						</div>
+						<div><span class="clearfix"></span></div>
+					</div>
+            
+					<div title="Payments" class="tab-pane am-fade" id="payments" role="tabpanel">
+						<div class="row" style="margin-top: 15px;">
+							<div class="col-xs-5 col-sm-5 col-md-5 col-lg-5">
+								<div class="smallLabel">For what</div>
+								<input type="text" class="form-control" maxlength="50" placeholder="Description">
+							</div>
+							<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+								<div class="smallLabel">Value</div>
+								<input type="number" class="form-control" placeholder="Amount">
+							</div>
+							<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+								<div class="smallLabel">.</div>
+								<button type="button" class="btn btn-primary">Add payment</button>
+							</div>
+						</div>
+            
+						<hr>
+           
+						<div style="text-align: center; margin-top: 16px;color:lightgreen;" class="pointer ">
+							<span style="font-size: 30px;" class=" glyphicon glyphicon-refresh" aria-hidden="true"></span>
+							<div>Refresh after finished payment</div>
+						</div>
+
+						<table class="table table-hover">
+							<thead>
+								<tr>
+									<th>created</th>
+									<th>for</th>
+									<th>value</th>
+									<th></th>
+									<th></th>
+								</tr>
+							</thead>
+							<tbody></tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<a target="_self" class="btn btn-default"><span style="font-size: 20px;" class="text-secondary" aria-hidden="true"><i class="fas fa-2x fa-plus-circle"></i></span></a>
+				<button type="button" class="btn btn-dark button-save">Save</button>
+				<button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Print</button>
+				<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- End Modal -->
+
+    <script>
       $(function () {
     	$('[data-toggle="tooltip"]').tooltip()
       })
