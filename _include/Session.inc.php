@@ -12,6 +12,7 @@
  *   - [2008.08.02] - Andrei Gavrila - Language support
  *   - [2008.09.16] - Andrei Gavrila - Changed language support to retrieve languages from the config file
  *   - [2011.02.13] - Andrei Gavrila - Added user language support
+ *   - [2018.09.20] - Andrei Gavrila - Fixed notice on first cookie access
  *   - []
  */
 
@@ -27,7 +28,7 @@ $db->query($szQuery);
  * Handle the cookie
  */
 
-$session = $_COOKIE[PROJECT_NAME . '_session'];
+$session = isset($_COOKIE[PROJECT_NAME . '_session']) ? $_COOKIE[PROJECT_NAME . '_session'] : '';
 
 if (empty($session)) {
   /*
