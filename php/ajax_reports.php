@@ -39,6 +39,9 @@ if (isset($_POST['consolidator']) && intval($_POST['consolidator']) > 0) {
 if (isset($_POST['date']) && date('Y-m-d', strtotime($_POST['date'])) ==  $_POST['date']) {
   $tmp0 .= "AND (r.leavingDate LIKE '" . mysql_escape_string($_POST['date']) . "%' OR r.returnDate LIKE '" . mysql_escape_string($_POST['date']) . "%')";
 }
+if (isset($_POST['terminal']) && intval($_POST['terminal']) > 0) {
+  $tmp0 .= "AND (r.terminal_in IS NULL OR r.terminal_out IS NULL)";
+}
 
 $reports = $db->query("SELECT r.*, s.name AS _type_name, s.acronym AS _type_acronym, a.name AS _airport_name, a.acronym AS _airport_acronym
                        FROM reports r

@@ -30,16 +30,27 @@ $report = $db->query("SELECT r.*, s.name AS _type_name, s.acronym AS _type_acron
                       INNER JOIN airport a ON a.id = r.airportID
                       INNER JOIN consolidator c ON c.id = r.consolidatorID
                       WHERE r.id = '" . mysql_escape_string($_POST['report']) . "'");
-if (is_array($report) && count($report)) {
-  $report[0]['_created_relative'] = relativeTime(strtotime($report[0]['created']));
-  $report[0]['_created_formatted'] = date('j M h:i', strtotime($report[0]['created']));
-  $report[0]['_lastUpdate_formatted'] = date('j M h:i', strtotime($report[0]['lastUpdate']));
-  $report[0]['_name'] = $report[0]['firstname'] . ' ' . $report[0]['surname'];
-  $report[0]['_leavingDate_formatted'] = date('d/m/Y', strtotime($report[0]['leavingDate']));
-  $report[0]['_leavingDate_additional'] = date('h:i A', strtotime($report[0]['leavingDate']));
-  $report[0]['_returnDate_formatted'] = date('d/m/Y', strtotime($report[0]['returnDate']));
-  $report[0]['_returnDate_additional'] = date('h:i A', strtotime($report[0]['returnDate']));
+if (!is_array($report) || !count($report)) {
+  die();
 }
+
+$report[0]['_created_relative'] = relativeTime(strtotime($report[0]['created']));
+$report[0]['_created_formatted'] = date('j M h:i', strtotime($report[0]['created']));
+$report[0]['_lastUpdate_formatted'] = date('j M h:i', strtotime($report[0]['lastUpdate']));
+$report[0]['_name'] = $report[0]['firstname'] . ' ' . $report[0]['surname'];
+$report[0]['_leavingDate_formatted'] = date('d/m/Y', strtotime($report[0]['leavingDate']));
+$report[0]['_leavingDate_additional'] = date('h:i A', strtotime($report[0]['leavingDate']));
+$report[0]['_returnDate_formatted'] = date('d/m/Y', strtotime($report[0]['returnDate']));
+$report[0]['_returnDate_additional'] = date('h:i A', strtotime($report[0]['returnDate']));
+
+$report[0]['_auditTrail'] = $db->query("SELECT * FROM audit_trail WHERE report = '" . mysql_escape_string($_POST['report']) . "' ORDER BY `date` DESC");
+if (is_array($report[0]['_auditTrail']) && count($report[0]['_auditTrail'])) {
+  foreach ($report[0]['_auditTrail'] as $a => $b) {
+    $report[0]['_auditTrail'][$a]['_record'] = json_decode($report[0]['_auditTrail'][$a]['record']);
+  }
+}
+
+$report[0]['_payment'] = $db->query("SELECT * FROM extra_payment WHERE report = '" . mysql_escape_string($_POST['report']) . "' ORDER BY `date` DESC");
 
 echo json_encode($report[0], JSON_PRETTY_PRINT);
 

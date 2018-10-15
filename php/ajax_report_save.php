@@ -56,9 +56,37 @@ if (!isset($_POST['terminal_out']) || !preg_match('/^[A-Za-z0-9]{1,}$/', $_POST[
   die();
 }
 
-$report = $db->query("SELECT id FROM reports r WHERE r.id = '" . mysql_escape_string($_POST['id']) . "'");
+$report = $db->query("SELECT * FROM reports r WHERE r.id = '" . mysql_escape_string($_POST['id']) . "'");
 if (!is_array($report) || !count($report)) {
   die();
+}
+
+$auditTrailFields = array(
+  'leavingDate',
+  'returnDate',
+  'carModel',
+  'carColour',
+  'carReg',
+  'returnFlightNum',
+  'terminal_in',
+  'terminal_out',
+  'notes'
+);
+
+$auditTrailResult = array();
+
+foreach ($auditTrailFields as $auditTrailFieldIndex => $auditTrailFieldValue) {
+  if ($_POST[$auditTrailFieldValue] != $report[0][$auditTrailFieldValue]) {
+    $auditTrailResult[] = array(
+      'field' => $auditTrailFieldValue,
+      'before' => $report[0][$auditTrailFieldValue],
+      'after' => $_POST[$auditTrailFieldValue]
+    );
+  }
+}
+
+if (count($auditTrailResult)) {
+  $db->query("INSERT INTO audit_trail (report, record) VALUES ('" . mysql_escape_string($_POST['id']) . "', '" . mysql_escape_string(json_encode($auditTrailResult, JSON_PRETTY_PRINT)) . "')");
 }
 
 $db->query("UPDATE reports

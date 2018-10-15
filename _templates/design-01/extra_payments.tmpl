@@ -1,38 +1,104 @@
-<div class="container-fluid">
-	<div class="row py-3">
-		<div class="col-xs-6 col-sm-4 pb-2 pb-sm-0 d-flex justify-content-md-start">
-			<div class="btn-group btn-group-toggle" data-toggle="buttons">
-				<label class="btn btn-secondary active">
-					<input type="radio" name="options" id="option1" autocomplete="off" checked> ALL
-				</label>
-				<label class="btn btn-secondary">
-					<input type="radio" name="options" id="option2" autocomplete="off"> MG
-				</label>
-				<label class="btn btn-secondary">
-					<input type="radio" name="options" id="option3" autocomplete="off"> PR
-				</label>
-			</div>
-		</div>
+<script language="javascript">
+request = {
+  service: '0',
+  airport: '0'
+};
 
-		<div class="col-xs-6 col-sm-4 pb-2 pb-sm-0 d-flex justify-content-md-center">
-			<div class="btn-group btn-group-toggle" data-toggle="buttons">
-				<label class="btn btn-secondary active">
-					<input type="radio" name="options" id="option1" autocomplete="off" checked> ALL
-				</label>
-				<label class="btn btn-secondary">
-					<input type="radio" name="options" id="option2" autocomplete="off"> LHR
-				</label>
-				<label class="btn btn-secondary">
-					<input type="radio" name="options" id="option3" autocomplete="off"> BHX
-				</label>
-				<label class="btn btn-secondary">
-					<input type="radio" name="options" id="option3" autocomplete="off"> LTN
-				</label>
-			</div>
-		</div>
-	</div>
+function refresh()
+{
+  $('.a_container').html($('.loader_container').html());
+
+  $.ajax({
+    url: 'ajax_extra_payments.php',
+    method: 'post',
+    data: request
+  }).done(function(data) {
+    var list = $($('.list_template').html());
+
+    for (var dataIndex in data) {
+      var listEntry = $($('.list_item_template').html());
+
+      for (var dataProperty in data[dataIndex]) {
+        listEntry.find('.data_' + dataProperty).each(function(index, element) {
+          $(element).html(data[dataIndex][dataProperty]);
+        });
+      }
+
+      list.find('.a_tbody').append(listEntry.find('.a_tr')[0]);
+    }
+
+    $('.a_container').html('');
+    $('.a_container').append(list);
+  });
+}
+
+$(document).ready(function() {
+  $('.property_refresh_check').on('change', function(event) {
+    var classList = $(event.currentTarget).attr('class').split(/\s+/);
+    $.each(classList, function(index, item) {
+      if (item.indexOf('property_name_') === 0) {
+        request[item.substr(14)] = $(event.currentTarget).attr('value');
+      }
+    });
+
+    refresh();
+  });
+
+  $('.property_refresh_select').on('click', function(event) {
+    var name = '';
+    var value = '0';
+
+    var classList = $(event.currentTarget).attr('class').split(/\s+/);
+    $.each(classList, function(index, item) {
+      if (item.indexOf('property_name_') === 0) {
+        name = item.substr(14);
+      }
+      if (item.indexOf('property_value_') === 0) {
+        value = item.substr(15);
+      }
+    });
+
+    if (name != '') {
+      request[name] = value;
+
+      refresh();
+    }
+  });
+
+  refresh();
+});
+</script>
+
+<div class="container-fluid">
+    <div class="row py-3">
+        <div class="col-xs-6 col-sm-4 pb-2 pb-sm-0 d-flex justify-content-md-start">
+            <div class="btn-group btn-group-toggle" data-toggle="buttons">
+              <label class="btn btn-secondary active">
+                <input type="radio" name="options" id="option1" autocomplete="off" value="0" class="property_refresh_check property_name_service" checked> ALL
+              </label>
+{foreach from=$services item=_i key=_k}
+              <label class="btn btn-secondary">
+                <input type="radio" name="options" id="option2" autocomplete="off" value="{$_i.id}" class="property_refresh_check property_name_service" /> {$_i.acronym}
+              </label>
+{/foreach}
+            </div>
+        </div>
+
+        <div class="col-xs-6 col-sm-4 pb-2 pb-sm-0 d-flex justify-content-md-center">
+            <div class="btn-group btn-group-toggle" data-toggle="buttons">
+              <label class="btn btn-secondary active">
+                <input type="radio" name="options" id="option1" autocomplete="off" value="0" class="property_refresh_check property_name_airport" checked> ALL
+              </label>
+{foreach from=$airports item=_i key=_k}
+              <label class="btn btn-secondary">
+                <input type="radio" name="options" id="option2" autocomplete="off" value="{$_i.id}" class="property_refresh_check property_name_airport"> {$_i.acronym}
+              </label>
+{/foreach}					  
+            </div>
+        </div>
+    </div>
 </div>
-<div class="container-fluid pb-2 bg-light">
+<div class="container-fluid pb-2 bg-light a_container">
 	<div class="row">
 		<div class="col-md-12">
 			<table class="table table-drivefly borderless">
@@ -49,4 +115,40 @@
 			</table>
 		</div>
 	</div>
+</div>
+
+<div class="loader_container" style="display: none;">
+<div class="row mx-0 py-3 text-muted border-bottom">
+	<div style="margin: 0 auto; color: #777" class="text-center">
+		<div class="lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+		<div style="margin-bottom: 24px; font-size: 36px; line-height: 40px; font-weight: 900">One moment please</div>
+		<p>We are looking for results using your criteria.</p>
+	</div>
+</div>
+</div>
+
+<div class="list_template" style="display: none;">
+	<div class="row">
+		<div class="col-md-12">
+			<table class="table table-drivefly borderless">
+				<tbody class="a_tbody">
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+
+<div class="list_item_template" style="display: none;">
+  <table>
+    <tbody>
+					<tr class="pointer a_tr">
+						<td class="data_date">02 Sep 13:22</td>
+						<td><span class="badge badge-secondary data__refNum">AFCH181990233</span></td>
+						<td>zara</td>
+						<td class="data_for">Extended Parking Charges (02/09/18-03/09/18)</td>
+						<td class="data_amount">15.00</td>
+						<td><span class="badge badge-pill badge-success data_status">OK</span></td>
+					</tr>
+    </tbody>
+  </table>
 </div>

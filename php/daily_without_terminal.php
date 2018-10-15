@@ -1,7 +1,7 @@
 <?php
 
 /*
- * extra_payments.php
+ * daily_without_terminal.php
  *   - 
  *
  * Author  : Andrei Gavrila (andrei.gavrila@gmail.com)
@@ -30,7 +30,10 @@ $html->assign('services', $services);
 $airports = $db->query("SELECT * FROM airport", "id");
 $html->assign('airports', $airports);
 
-$html->tDisplay('extra_payments.tmpl', $session['language']);
+$consolidators = $db->query("SELECT * FROM consolidator", "id");
+$html->assign('consolidators', $consolidators);
+
+$html->tDisplay('daily_without_terminal.tmpl', $session['language']);
 
 function smarty_function_md5_rand($params, &$smarty)
 {

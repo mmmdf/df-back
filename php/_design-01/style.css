@@ -82,6 +82,25 @@ padding: 0px;
 	cursor: pointer;
 }
 
+/* Dropzone */
+.dropzone {
+  border: 2px dashed #e0e0e0;
+  margin-bottom: 12px;
+}
+.dropzone .dz-message {
+  color: #9e9e9e;
+}
+.dropzone .dz-preview.dz-file-preview .dz-image {
+  border-radius: 6px;
+}
+.dropzone .dz-preview .dz-image img {
+  height: 120px !important;
+}
+
+.image-upload-dropzone{
+  height: 120px !important;
+  background-color: #6c757d;
+}
 
 /* START Loader css */
 

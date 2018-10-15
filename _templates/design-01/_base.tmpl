@@ -10,6 +10,7 @@
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="_design-01/style.css" >
+	<link rel="stylesheet" type="text/css" href="_design-01/dropzone.css" >
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/css/tempusdominus-bootstrap-4.min.css" />
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
 	
@@ -19,9 +20,15 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/js/tempusdominus-bootstrap-4.min.js"></script>	
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/js/tempusdominus-bootstrap-4.min.js"></script>
+	<script src="_design-01/js/dropzone.js"></script>
 
     <script>
+Dropzone.autoDiscover = false;
+
+var myDropzone = null;
+var reportId = 0;
+
 $(document).ready(function() {
   $('.a_search_close').on('click', function(e) {
     $('.a_search_container').hide();
@@ -63,7 +70,41 @@ $(document).ready(function() {
       $('.a_search_container').show();
     });
   });
-  
+
+  myDropzone = new Dropzone('.dropzone', { 
+    url: '/image_upload.php',
+    acceptedFiles: 'image/*',
+    thumbnailWidth: 75,
+    thumbnailHeight: null,
+	addRemoveLinks: true,
+	removedfile: function(file) {
+      Dropzone.confirm('Do you want to delete?', function() {
+        $.ajax({
+          url: 'image_delete.php',
+          type: 'post',
+          cache: false,
+          dataType: 'json',
+          traditional: true,
+          data: { id: file.id },
+          success: function (data) {
+            $(document).find(file.previewElement).remove();
+          },
+          error: function (err) {
+            alert('Failed to delete file (' + err.status + ').');
+          }
+        });
+      }, function() { return false; });
+    }
+  });
+
+  myDropzone.on('sending', function(file, xhr, formData) {
+    formData.append('report', reportId);
+  });
+
+  $('.dropzone').on('click', '.dz-preview', function(event) {
+    window.open($(event.currentTarget).find('img').attr('src').replace('.jpg', '-original.jpg'), '_blank');
+  });
+
   $('#editReportModal').on('show.bs.modal', function (event) {
     $('#editReportModal').find('.modal-content > div').each(function(index, element) {
       if ($(element).hasClass('modal-loader')) {
@@ -73,11 +114,33 @@ $(document).ready(function() {
       }
     });
 
+    reportId = $(event.relatedTarget).data('report-id');
+
     $.ajax({
       url: 'ajax_report.php',
       method: 'post',
       data: { report: $(event.relatedTarget).data('report-id') }
-    }).done(function(data){
+    }).done(function(data) {
+      $('.dropzone').find('.dz-preview').remove();
+
+      $.ajax({
+        url: 'image_upload.php',
+        type: 'get',
+        cache: false,
+        traditional: true,
+        data: { report: reportId }
+      }).done(function(data) {
+        $.each(data, function(key,value) {
+          var mockFile = { id: value.id, name: value.name, size: value.size, reportId: value.reportId };
+
+          myDropzone.emit('addedfile', mockFile);
+
+          myDropzone.emit('thumbnail', mockFile, 'data/images/' + value.name);
+
+          myDropzone.emit('complete', mockFile);
+        });
+      });
+
       for (var reportProperty in data) {
         $('#editReportModal').find('.data_' + reportProperty).each(function(index, element) {
           if ($(element).is('input') || $(element).is('textarea')) {
@@ -111,6 +174,145 @@ $(document).ready(function() {
       $('[data-target="#leaving_time"]').val(data['_leavingDate_additional']);
       $('#returning_datepicker').val(data['_returnDate_formatted']);
       $('[data-target="#returning_time"]').val(data['_returnDate_additional']);
+
+      // Amendments
+      //
+
+      $('#editReportModal').find('.a_amendments').find('tbody').children().remove();
+
+      for (var auditTrailItemIndex in data['_auditTrail']) {
+        var auditTrailRow = $($('.template_modal_amendments_row1').html());
+
+        for (var auditTrailProperty in data['_auditTrail'][auditTrailItemIndex]) {
+          auditTrailRow.find('.data_' + auditTrailProperty).each(function(index, element) {
+            $(element).html(data['_auditTrail'][auditTrailItemIndex][auditTrailProperty]);
+          });
+        }
+
+        for (var auditTrailRecordIndex in data['_auditTrail'][auditTrailItemIndex]['_record']) {
+          var auditTrailRecord = $($('.template_modal_amendments_row2').html());
+
+          for (var auditTrailProperty in data['_auditTrail'][auditTrailItemIndex]['_record'][auditTrailRecordIndex]) {
+            auditTrailRecord.find('.data_' + auditTrailProperty).each(function(index, element) {
+              $(element).html(data['_auditTrail'][auditTrailItemIndex]['_record'][auditTrailRecordIndex][auditTrailProperty]);
+            });
+          }
+
+          auditTrailRow.find('.a_before').after($(auditTrailRecord.find('tr').get(0)));
+        }
+
+        $($('#editReportModal').find('.a_amendments').find('tbody').get(0)).append($(auditTrailRow.find('tr').get(0)));
+      }
+
+      // Payments
+      //
+
+      $('#editReportModal').find('.a_payments_list').find('tbody').children().remove();
+
+      for (var paymentItemIndex in data['_payment']) {
+        var paymentRow = $($('.template_modal_payments_row').html());
+
+        for (var property in data['_payment'][paymentItemIndex]) {
+          paymentRow.find('.data_' + property).each(function(index, element) {
+            if ($(element).is('input')) {
+              $(element).val(data['_payment'][paymentItemIndex][property]);
+            } else {
+              $(element).html(data['_payment'][paymentItemIndex][property]);
+            }
+          });
+        }
+
+        paymentRow.find('.a-link-setaspaid').on('click', function(event) {
+          $.ajax({
+            url: 'ajax_payment_setaspaid.php',
+            method: 'post',
+            data: { id: $(event.currentTarget).parents('tr').find('.data_id').val() }
+          }).done(function(data) {
+            $(event.currentTarget).parents('tr').find('.data_status').html(data['status']);
+          });
+        });
+
+        paymentRow.find('.a-link-delete').on('click', function(event) {
+          $.ajax({
+            url: 'ajax_payment_delete.php',
+            method: 'post',
+            data: { id: $(event.currentTarget).parents('tr').find('.data_id').val() }
+          }).done(function(data) {
+            $(event.currentTarget).parents('tr').remove();
+          });
+        });
+
+        $($('#editReportModal').find('.a_payments_list').find('tbody').get(0)).append($(paymentRow.find('tr').get(0)));
+      }
+
+      $('#editReportModal .a_payments_add_payment').off('click');
+
+      $('#editReportModal .a_payments_add_payment').on('click', function(event) {
+        var properties = {literal}{report: reportId}{/literal};
+        var invalid = false;
+
+        $('#editReportModal').find('.a_payments_data').each(function(index, element) {
+          var classList = $(element).attr('class').split(/\s+/);
+          $.each(classList, function(index, item) {
+            if (item.indexOf('a_payments_data_property_') === 0) {
+              properties[item.substr(25)] = $(element).val();
+
+              invalid = invalid || !element.checkValidity();
+            }
+          });
+        });
+
+        if (!invalid) {
+          $.ajax({
+            url: 'ajax_payment_add.php',
+            method: 'post',
+            data: properties
+          }).done(function(data) {
+            var paymentRow = $($('.template_modal_payments_row').html());
+
+            for (var property in data['payment']) {
+              paymentRow.find('.data_' + property).each(function(index, element) {
+                if ($(element).is('input')) {
+                  $(element).val(data['payment'][property]);
+                } else {
+                  $(element).html(data['payment'][property]);
+                }
+              });
+            }
+
+            paymentRow.find('.a-link-setaspaid').on('click', function(event) {
+              $.ajax({
+                url: 'ajax_payment_setaspaid.php',
+                method: 'post',
+                data: { id: $(event.currentTarget).parents('tr').find('.data_id').val() }
+              }).done(function(data) {
+                $(event.currentTarget).parents('tr').find('.data_status').html(data['status']);
+              });
+            });
+
+            paymentRow.find('.a-link-delete').on('click', function(event) {
+              $.ajax({
+                url: 'ajax_payment_delete.php',
+                method: 'post',
+                data: { id: $(event.currentTarget).parents('tr').find('.data_id').val() }
+              }).done(function(data) {
+                $(event.currentTarget).parents('tr').remove();
+              });
+            });
+
+            $($('#editReportModal').find('.a_payments_list').find('tbody').get(0)).prepend($(paymentRow.find('tr').get(0)));
+
+            $('#editReportModal').find('.a_payments_data').each(function(index, element) {
+              var classList = $(element).attr('class').split(/\s+/);
+              $.each(classList, function(index, item) {
+                if (item.indexOf('a_payments_data_property_') === 0) {
+                  $(element).val('');
+                }
+              });
+            });
+          });
+        }
+      });
 
       $('#editReportModal .button-save').off('click');
 
@@ -149,6 +351,14 @@ $(document).ready(function() {
             $('#editReportModal').modal('hide');
 
             refresh();
+
+            $('.alertZone').html($('.alertTemplate').html());
+
+            $('.alertZone').find('.alert').show();
+
+            $('.alertZone').on('click', 'button', function(event) {
+              $('.alertZone').find('.alert').hide('fade');
+            });
           });
         }
       });
@@ -174,6 +384,16 @@ $(document).ready(function() {
     </script>
   </head>
   <body>
+    <div class="alertZone">
+    </div>
+
+    <div class="alertTemplate" style="display: none;">
+      <div class="alert alert-success" style="display: none; margin-bottom: 0;">
+        <strong>Holy guacamole!</strong> You've done it!
+        <button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      </div>
+    </div>
+
 	 <nav class="navbar navbar-expand-md bg-light navbar-light shadow-sm px-sm-0">
 		<div class="container-fluid">
 			<a class="navbar-brand" href="#"><i class="fa d-inline fa-lg fa-plane"></i><strong> rishi2</strong></a>
@@ -198,7 +418,7 @@ $(document).ready(function() {
 			  <li class="nav-item dropdown mx-2">
 				<a class="nav-link dropdown-toggle" href="https://example.com" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Other</a>
 				<div class="dropdown-menu" aria-labelledby="dropdown01">
-				  <a class="dropdown-item" href="daily-without-terminal.html">Daily without terminal</a>
+				  <a class="dropdown-item" href="daily_without_terminal.php">Daily without terminal</a>
 				  <a class="dropdown-item" href="price.html">Price</a>
 				  <a class="dropdown-item" href="products.php">Products</a>
 				  <a class="dropdown-item" href="extra_payments.php">Extra payments</a>
@@ -218,7 +438,7 @@ $(document).ready(function() {
 				</form>
 				<ul class="navbar-nav">
 				  <li class="nav-item">
-					<a class="nav-link" href="#"><i class="fa d-inline fa-lg fa-plus-circle"></i></a>
+					<a class="nav-link" href="/add.php"><i class="fa d-inline fa-lg fa-plus-circle"></i></a>
 				  </li>
 				  <li class="nav-item">
 					<a class="nav-link" href="#"><i class="fa d-inline fa-lg fa-cog"></i></a>
@@ -366,15 +586,15 @@ $(document).ready(function() {
 						<div class="row">
 						   <div class="col-md-4">
 								  <div class="smallLabel">Car Make and Model</div>  
-								  <input maxlength="25" type="text" name="carModel" class="form-control data_carModel save-data save-data-property-carModel" value="" pattern="[A-Za-z0-9 ]+" title="">
+								  <input maxlength="25" type="text" name="carModel" class="form-control data_carModel save-data save-data-property-carModel" value="" pattern="{literal}[A-Za-z0-9 ]{1,}{/literal}" title="">
 						   </div>
 						   <div class="col-md-4">
 								  <div class="smallLabel">Car Colour</div>  
-								  <input maxlength="12" type="text" name="carColor" class="form-control data_carColour save-data save-data-property-carColour" value="" pattern="[A-Za-z ]+" title="">
+								  <input maxlength="12" type="text" name="carColor" class="form-control data_carColour save-data save-data-property-carColour" value="" pattern="{literal}[A-Za-z ]{1,}{/literal}" title="">
 						   </div>
 						   <div class="col-md-4">
 								  <div class="smallLabel">Reg Number</div>  
-								  <input maxlength="10" type="text" name="carReg" class="form-control text-center data_carReg save-data save-data-property-carReg" value="" pattern="[A-Za-z0-9 ]+" title="">
+								  <input maxlength="10" type="text" name="carReg" class="form-control text-center data_carReg save-data save-data-property-carReg" value="" pattern="{literal}[A-Za-z0-9 ]{1,}{/literal}" title="">
 						   </div>
 					   </div>
 
@@ -438,7 +658,7 @@ $(document).ready(function() {
 					</div>
 			
 					<div title="Amendments" class="tab-pane am-fade" id="amendments" role="tabpanel">
-						<table class="table table-condensed"  style="margin-top: 15px;">
+						<table class="table table-condensed a_amendments"  style="margin-top: 15px;">
 							<tbody>
 								<tr class="">
 									<td class="">2018-09-23 10:17:32<br><br>DDFHPR</td>
@@ -499,37 +719,33 @@ $(document).ready(function() {
 					</div>
             
 					<div title="Photos" class="tab-pane am-fade" id="photos" role="tabpanel">
-						<div class="row" style="margin-top: 15px;">
-							<div class="custom-file">
-								<input type="file" class="custom-file-input" id="customFile">
-								<label class="custom-file-label" for="customFile">Choose file</label>
+						<div class="container-fluid">
+							<div class="row" style="margin-top: 15px;" id="">
+								<div class="col-sm-12">
+									<span class="heading">Report images:</span>
+									<div class='image-upload-container'>
+										<div class="dropzone"></div>
+										<p class="explanation text-center"><strong>Accepted files:</strong> JPG, PNG, GIF; maximum file size: 20MB.</p>
+									</div>
+								</div>
 							</div>
+							<div><span class="clearfix"></span></div>
 						</div>
-
-						<div class="row">
-							<div class="progress" style="margin-bottom:0">
-								<div class="progress-bar " role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
-							</div>
-						</div>
-						<div class="progress" style="margin-bottom:0">
-							<div class="progress-bar " role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
-						</div>
-						<div><span class="clearfix"></span></div>
 					</div>
             
 					<div title="Payments" class="tab-pane am-fade" id="payments" role="tabpanel">
 						<div class="row" style="margin-top: 15px;">
 							<div class="col-xs-5 col-sm-5 col-md-5 col-lg-5">
 								<div class="smallLabel">For what</div>
-								<input type="text" class="form-control" maxlength="50" placeholder="Description">
+								<input type="text" class="form-control a_payments_data a_payments_data_property_for" maxlength="50" placeholder="Description">
 							</div>
 							<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
 								<div class="smallLabel">Value</div>
-								<input type="number" class="form-control" placeholder="Amount">
+								<input type="number" class="form-control a_payments_data a_payments_data_property_amount" placeholder="Amount">
 							</div>
 							<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
 								<div class="smallLabel">.</div>
-								<button type="button" class="btn btn-primary">Add payment</button>
+								<button type="button" class="btn btn-primary a_payments_add_payment">Add payment</button>
 							</div>
 						</div>
             
@@ -540,7 +756,7 @@ $(document).ready(function() {
 							<div>Refresh after finished payment</div>
 						</div>
 
-						<table class="table table-hover">
+						<table class="table table-hover a_payments_list">
 							<thead>
 								<tr>
 									<th>created</th>
@@ -563,6 +779,67 @@ $(document).ready(function() {
 			</div>
 		</div>
 	</div>
+</div>
+
+<div class="template_modal_amendments_row1" style="display: none;">
+  <table>
+    <tbody>
+      <tr class="">
+        <td class="">
+          <span class="data_date">2018-09-10 17:33:33</span><br><br>DDFHPR
+        </td>
+        <td>
+          <table class="table table-condensed">
+            <tbody>
+              <tr class="a_before">
+                <th>field</th>
+                <th>before</th>
+                <th>after</th>
+              </tr>
+            </tbody>
+          </table>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="template_modal_amendments_row2" style="display: none;">
+  <table>
+    <tbody>
+      <tr class="">
+        <td class="data_field">ppl</td>
+        <td class="data_before">0</td>
+        <td class="data_after">2</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="template_modal_payments_row" style="display: none;">
+  <table>
+    <tbody>
+      <tr>
+        <td class="data_date">&nbsp;</td>
+        <td class="data_for">&nbsp;</td>
+        <td class="data_amount">&nbsp;</td>
+        <td><span class="badge badge-pill data_color_selector_status data_status badge-success data_status">OK</span></td>
+        <td>
+          <input type="hidden" class="data_id" />
+          <div class="btn-group dropup">
+            <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Actions</button>
+            <div class="dropdown-menu">
+              <a class="dropdown-item a-link-paynow" href="#">Pay now</a>
+              <a class="dropdown-item a-link-setaspaid" href="#">Set as paid</a>
+              <a class="dropdown-item a-link-copylinktopayment" href="#">Copy link to Payment</a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item a-link-delete" href="#">Delete</a>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
 </div>
 
 <!-- End Modal -->
