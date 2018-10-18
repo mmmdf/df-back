@@ -1,22 +1,28 @@
 <script>
 $(document).ready(function() {
-  $('#leaving_datepicker').datetimepicker({
+  $('#leaving_datepicker_add').datetimepicker({
     format: 'DD/MM/YYYY'
   });
 
-  $('#returning_datepicker').datetimepicker({
+  $('#returning_datepicker_add').datetimepicker({
     format: 'DD/MM/YYYY'
   });
 
-  $('#leaving_time').datetimepicker({
+  $('#leaving_time_add').datetimepicker({
     format: 'LT'
   });
 
-  $('#returning_time').datetimepicker({
+  $('#returning_time_add').datetimepicker({
     format: 'LT'
   });
-});  
+
+  $('.a_form').on('submit', function(event) {
+    $('.leavingDate').val(moment($('#leaving_datepicker_add').val() + ' ' + $('#leaving_time_add').find('input').val(), 'D/M/YYYY h:m A').format('YYYY-MM-DD HH:mm:ss'));
+    $('.returnDate').val(moment($('#returning_datepicker_add').val() + ' ' + $('#returning_time_add').find('input').val(), 'D/M/YYYY h:m A').format('YYYY-MM-DD HH:mm:ss'));
+  });
+});
 </script>
+
 <div class="container-fluid">
 	<div class="row">
 		<div class="col-lg-12">
@@ -27,7 +33,9 @@ $(document).ready(function() {
 					</div>
 				</div>
 			</div>
-			<form action="add.php" method="POST">
+			<form action="add.php" method="POST" class="a_form">
+                <input type="hidden" class="leavingDate" name="leavingDate" />
+                <input type="hidden" class="returnDate" name="returnDate" />
 				<div class="container-fluid p-2 bg-light">
 					<div class="row mx-0">
 						<div class="col-md-12 p-2 bg-white">
@@ -35,25 +43,25 @@ $(document).ready(function() {
 								<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
 									<div class="form-group">
 										<label for="name">Name</label>
-										<input type="text" id="name" name="firstname" class="form-control" maxlength="25" pattern="{literal}[A-Za-z]{2,}{/literal}" required>
+										<input type="text" id="name" name="firstname" class="form-control" maxlength="25" pattern="{literal}[A-Za-z]{2,}{/literal}" required {if isset($report)}value="{$report.firstname}"{/if}>
 									</div>
 								</div>
 								<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
 									<div class="form-group">
 										<label for="surname">Surname</label>
-										<input type="text" id="surname" name="surname" class="form-control" maxlength="25" pattern="{literal}[A-Za-z]{2,}{/literal}" required>
+										<input type="text" id="surname" name="surname" class="form-control" maxlength="25" pattern="{literal}[A-Za-z]{2,}{/literal}" required {if isset($report)}value="{$report.surname}"{/if}>
 									</div>
 								</div>
 								<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
 									<div class="form-group">
 										<label for="email">Email</label>
-										<input type="email" id="email" name="email" class="form-control" required>
+										<input type="email" id="email" name="email" class="form-control" required {if isset($report)}value="{$report.email}"{/if}>
 									</div>
 								</div>
 								<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
 									<div class="form-group">
 										<label for="mobile">Mobile</label>
-										<input type="text" id="mobile" name="mobile" class="form-control" maxlength="25" pattern="{literal}[0-9 .+/]{10,}{/literal}" required>
+										<input type="text" id="mobile" name="mobile" class="form-control" maxlength="25" pattern="{literal}[0-9 .+/]{10,}{/literal}" required {if isset($report)}value="{$report.mobile}"{/if}>
 									</div>
 								</div>
 							</div>
@@ -66,7 +74,7 @@ $(document).ready(function() {
 									<label>Service</label>
 									<select id="type" class="form-control" name="typeID">
 {foreach from=$services item=_i key=_k}
-										<option value="{$_i.id}">{$_i.name}</option>
+										<option value="{$_i.id}"{if isset($report) && $report.typeID==$_i.id} selected{/if}>{$_i.name}</option>
 {/foreach}
 									</select>
 								</div>
@@ -76,7 +84,7 @@ $(document).ready(function() {
 	
 									<select id="airport" class="form-control" name="airportID">
 {foreach from=$airports item=_i key=_k}
-									<option value="{$_i.id}">{$_i.name}</option>
+									<option value="{$_i.id}"{if isset($report) && $report.airportID==$_i.id} selected{/if}>{$_i.name}</option>
 {/foreach}
 									</select>
 								</div>
@@ -88,15 +96,15 @@ $(document).ready(function() {
 									<div class="col-md-6">
 										<div class="form-group">
 											<label for="dateStart">Leaving on</label>
-											<input type="text" class="form-control datetimepicker-input" id="leaving_datepicker" name="leaving_datepicker" placeholder="dd/mm/yyyy" data-toggle="datetimepicker" data-target="#leaving_datepicker" required>
+											<input type="text" class="form-control datetimepicker-input" id="leaving_datepicker_add" name="leaving_datepicker" placeholder="dd/mm/yyyy" data-toggle="datetimepicker" data-target="#leaving_datepicker_add" required>
 										</div>
 									</div>
 									<div class="col-md-6">
 										<div class="form-group">
 											<label for="timeStart">Leaving Time</label>
-											<div class="input-group date" id="leaving_time" data-target-input="nearest">
-												<input type="text" name="leaving_time" class="form-control datetimepicker-input" data-target="#leaving_time" placeholder="hh:mm" required/>
-												<div class="input-group-append" data-target="#leaving_time" data-toggle="datetimepicker">
+											<div class="input-group date" id="leaving_time_add" data-target-input="nearest">
+												<input type="text" name="leaving_time" class="form-control datetimepicker-input" data-target="#leaving_time_add" placeholder="hh:mm" required/>
+												<div class="input-group-append" data-target="#leaving_time_add" data-toggle="datetimepicker">
 													<div class="input-group-text"><i class="fas fa-clock"></i></div>
 												</div>
 											</div>
@@ -105,15 +113,15 @@ $(document).ready(function() {
 									<div class="col-md-6">
 										<div class="form-group">
 											<label for="dateEnd">Returning on</label>
-											<input type="text" class="form-control datetimepicker-input" id="returning_datepicker" name="returning_datepicker" placeholder="dd/mm/yyyy" data-toggle="datetimepicker" data-target="#returning_datepicker" required>
+											<input type="text" class="form-control datetimepicker-input" id="returning_datepicker_add" name="returning_datepicker" placeholder="dd/mm/yyyy" data-toggle="datetimepicker" data-target="#returning_datepicker_add" required>
 										</div>
 									</div>
 									<div class="col-md-6">
 										<div class="form-group">
 											<label for="timeEnd">Returning Time</label>
-											<div class="input-group date" id="returning_time" data-target-input="nearest">
-												<input type="text" name="returning_time" class="form-control datetimepicker-input" data-target="#returning_time" placeholder="hh:mm" required/>
-												<div class="input-group-append" data-target="#returning_time" data-toggle="datetimepicker">
+											<div class="input-group date" id="returning_time_add" data-target-input="nearest">
+												<input type="text" name="returning_time" class="form-control datetimepicker-input" data-target="#returning_time_add" placeholder="hh:mm" required/>
+												<div class="input-group-append" data-target="#returning_time_add" data-toggle="datetimepicker">
 													<div class="input-group-text"><i class="fas fa-clock"></i></div>
 												</div>
 											</div>
@@ -143,19 +151,19 @@ $(document).ready(function() {
 									<div class="col-md-4">
 										<div class="form-group">
 											<label for="carReg">Car Reg</label>
-											<input type="text" id="carReg" name="carReg" class="form-control" maxlength="10" pattern="{literal}[A-Za-z0-9 ]{1,}{/literal}" required>
+											<input type="text" id="carReg" name="carReg" class="form-control" maxlength="10" pattern="{literal}[A-Za-z0-9 ]{1,}{/literal}" required {if isset($report)}value="{$report.carReg}"{/if}>
 										</div>
 									</div>
 									<div class="col-md-4">
 										<div class="form-group">
 											<label for="carModel">Car Model</label>
-											<input type="text" id="carModel" name="carModel" class="form-control" maxlength="25" pattern="{literal}[A-Za-z0-9 ]{1,}{/literal}" required>
+											<input type="text" id="carModel" name="carModel" class="form-control" maxlength="25" pattern="{literal}[A-Za-z0-9 ]{1,}{/literal}" required {if isset($report)}value="{$report.carModel}"{/if}>
 										</div>
 									</div>
 									<div class="col-md-4">
 										<div class="form-group">
 											<label for="carColor">Car Colour</label>
-											<input type="text" id="carColor" name="carColour" class="form-control" maxlength="12" pattern="{literal}[A-Za-z ]{1,}{/literal}" required>
+											<input type="text" id="carColor" name="carColour" class="form-control" maxlength="12" pattern="{literal}[A-Za-z ]{1,}{/literal}" required {if isset($report)}value="{$report.carColour}"{/if}>
 										</div>
 									</div>
 								</div>
@@ -189,14 +197,14 @@ $(document).ready(function() {
 									<label for="agent">Consolidator</label>
 									<select class="form-control" name="consolidatorID">
 {foreach from=$consolidators item=_i key=_k}								
-										<option value="{$_i.id}">{$_i.name}</option>
+										<option value="{$_i.id}"{if isset($report) && $report.consolidatorID==$_i.id} selected{/if}>{$_i.name}</option>
 {/foreach}
 									</select>
 								</div>
 	
 								<div class="form-group">
 									<label for="ref">Reference</label>
-									<input type="text" id="ref" name="refNum" class="form-control" maxlength="12" pattern="{literal}[A-Za-z ]{1,}{/literal}">
+									<input type="text" id="ref" name="refNum" class="form-control" maxlength="12" pattern="{literal}[A-Za-z0-9 ]{1,}{/literal}">
 									<small>Leave empty to autogenerate</small>
 								</div>
 								<div class="form-group">
@@ -212,7 +220,7 @@ $(document).ready(function() {
 							<div class="card py-2 px-3 border-0 rounded-0">
 								<div class="form-group">
 									<label for="comment">comment</label>
-									<textarea name="comment" maxlength="255" rows="5" class="form-control"></textarea>
+									<textarea name="notes" maxlength="255" rows="5" class="form-control"></textarea>
 								</div>
 							</div>
 						</div>

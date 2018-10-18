@@ -362,9 +362,15 @@ $(document).ready(function() {
           });
         }
       });
+
+      $('#editReportModal .button-add').off('click');
+
+      $('#editReportModal .button-add').on('click', function(event) {
+        window.location = 'add.php?report=' + reportId;
+      });
     });
   });
-  
+
   $('#leaving_datepicker').datetimepicker({
     format: 'DD/MM/YYYY'
   });
@@ -422,8 +428,8 @@ $(document).ready(function() {
 				  <a class="dropdown-item" href="price.html">Price</a>
 				  <a class="dropdown-item" href="products.php">Products</a>
 				  <a class="dropdown-item" href="extra_payments.php">Extra payments</a>
-				  <a class="dropdown-item" href="alerts.html">Alerts</a>
-				  <a class="dropdown-item" href="log.html">Logs</a>
+				  <a class="dropdown-item" href="alerts.php">Alerts</a>
+				  <a class="dropdown-item" href="log.php">Logs</a>
 				</div>
 			  </li>
 			</ul>
@@ -772,7 +778,7 @@ $(document).ready(function() {
 				</div>
 			</div>
 			<div class="modal-footer">
-				<a target="_self" class="btn btn-default"><span style="font-size: 20px;" class="text-secondary" aria-hidden="true"><i class="fas fa-2x fa-plus-circle"></i></span></a>
+				<a target="_self" class="btn btn-default button-add"><span style="font-size: 20px;" class="text-secondary" aria-hidden="true"><i class="fas fa-2x fa-plus-circle"></i></span></a>
 				<button type="button" class="btn btn-dark button-save">Save</button>
 				<button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Print</button>
 				<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>

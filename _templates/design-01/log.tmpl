@@ -1,0 +1,121 @@
+<script language="javascript">
+function refresh()
+{
+  $('.a_container > div').each(function(index, element) {
+    if ($(element).hasClass('a_loader')) {
+      $(element).show();
+    } else {
+      $(element).hide();
+    }
+  });
+
+  $.ajax({
+    url: 'ajax_log.php',
+    method: 'post'
+  }).done(function(data) {
+    $('.a_tbody1').empty();
+
+    for (var dataIndex in data) {
+      var row1 = $($('.a_template_row1').html());
+
+      for (var dataProperty in data[dataIndex]) {
+        row1.find('.data_' + dataProperty).each(function(index, element) {
+          $(element).html(data[dataIndex][dataProperty]);
+        });
+      }
+
+      for (var recordIndex in data[dataIndex]['_record']) {
+        var row2 = $($('.a_template_row2').html());
+
+        for (var recordProperty in data[dataIndex]['_record'][recordIndex]) {
+          row2.find('.data_' + recordProperty).each(function(index, element) {
+            $(element).html(data[dataIndex]['_record'][recordIndex][recordProperty]);
+          });
+        }
+
+        row1.find('.a_tbody2').append(row2.find('.a_tr2'));
+      }
+
+      $('.a_tbody1').append(row1.find('.a_tr1'));
+    }
+
+    $('.a_container > div').each(function(index, element) {
+      if ($(element).hasClass('a_loader')) {
+        $(element).hide();
+      } else {
+        $(element).show();
+      }
+    });
+  });
+}
+
+$(document).ready(function() {
+  $('.a_button_refresh').on('click', function(event) {
+    refresh();
+  });
+
+  refresh();
+});
+</script>
+
+<div class="container-fluid pb-2 bg-light a_container">
+    <div class="row mx-0 py-3 text-muted border-bottom a_loader" style="display: none;">
+        <div style="margin: 0 auto; color: #777" class="text-center">
+            <div class="lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+            <div style="margin-bottom: 24px; font-size: 36px; line-height: 40px; font-weight: 900">One moment please</div>
+            <p>We are looking for results using your criteria.</p>
+        </div>
+    </div>
+
+    <div class="row" style="display: none;">
+        <div class="col py-2">
+            <button type="button" class="btn btn-primary a_button_refresh">Refresh</button>
+        </div>
+    </div>
+
+    <div class="row" style="display: none;">
+        <div class="col-md-12 pb-5">
+            <table class="table table-drivefly borderless text-center">
+                <tbody class="a_tbody1">
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="a_template_row1" style="display: none;">
+    <table>
+        <tbody>
+            <tr class="a_tr1">
+                <td style="width: 10%" class="data__date_formatted">PLACEHOLDER__DATE_FORMATTED</td>
+                <td style="width: 10%"><span class="badge badge-success data__refNum">PLACEHOLDER__REFNUM</span></td>
+                <td style="width: 70%">
+                    <table class="table table-condensed">
+                        <thead>
+                            <tr>
+                                <th>field</th>
+                                <th>before</th>
+                                <th>after</th>
+                            </tr>
+                        </thead>
+                        <tbody class="a_tbody2">
+                        </tbody>
+                    </table>
+                </td>
+                <td style="width: 10%">PLACEHOLDER_SOMETHING</td> 
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="a_template_row2" style="display: none;">
+    <table>
+        <tbody>
+            <tr class="a_tr2">
+                <td class="data_field">PLACEHOLDER_FIELD</td>
+                <td class="data_before">PLACEHOLDER_BEFORE</td>
+                <td class="data_after">PLACEHOLDER_AFTER</td>
+            </tr>
+        </tbody>
+    </table>
+</div>

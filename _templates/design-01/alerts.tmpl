@@ -1,0 +1,49 @@
+<div class="container-fluid p-2 bg-white">
+  <div class="row">
+    <div class="col py-2">
+      <form action="alerts.php" method="post" class="form-inline">
+        <div class="form-group px-2">
+          <label>When Reg = </label>
+          <input type="text" name="carReg" class="form-control mx-2 py-0" placeholder="XX00XXX" maxlength="10" pattern="{literal}[A-Za-z0-9 ]{1,}{/literal}" required>
+        </div>
+
+        <div class="form-group pr-2">
+          <label>send to Email</label>
+          <input type="email" name="email" class="form-control mx-2 py-0" placeholder="example@email.com" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Add</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid p-2 bg-light">
+{foreach from=$alerts item=_i key=_k}
+  <div class="row">
+    <div class="col-md-12">
+      <div class="py-2 my-1 bg-white">
+        <form action="alerts.php" method="post" class="form-inline">
+          <input type="hidden" name="id" value="{$_i.id}" readonly>
+
+          <div class="form-group px-2">
+            <label>When Reg = </label>
+            <input type="text" class="form-control mx-2 py-0" value="{$_i.carReg|htmlentities}" readonly="readonly">
+          </div>
+
+          <div class="form-group pr-2">
+            <label>send to Email</label>
+            <input type="email" class="form-control mx-2 py-0" value="{$_i.email|htmlentities}" readonly="readonly">
+          </div>
+
+          <div class="form-group pr-2">
+            <label>created {$_i.created}</label>
+          </div>
+
+          <button type="submit" class="btn btn-secondary">Delete</button>
+        </form>
+      </div>
+    </div>
+  </div>
+{/foreach}
+</div>

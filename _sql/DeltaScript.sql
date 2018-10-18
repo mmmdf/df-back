@@ -82,3 +82,19 @@ ALTER TABLE `extra_payment`
   ALTER TABLE `extra_payment`
   ADD CONSTRAINT `extra_payment_report` FOREIGN KEY (`report`) REFERENCES `reports` (`id`);
 COMMIT;
+
+-------------------------------------------------------------------------------------------------
+
+CREATE TABLE alerts (
+  id int(11) UNSIGNED NOT NULL,
+  carReg varchar(25) NOT NULL,
+  email varchar(32) NOT NULL,
+  created datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+ALTER TABLE alerts
+  ADD PRIMARY KEY (id);
+
+ALTER TABLE alerts
+  MODIFY id int(11) UNSIGNED NOT NULL AUTO_INCREMENT;
+COMMIT;

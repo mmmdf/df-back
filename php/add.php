@@ -9,7 +9,6 @@
  * Licence : GPL 2.0
  *
  * Changes :
- *   - [2011.02.13] - Andrei Gavrila - Upgrade to Smarty 3
  *   - []
  */
 
@@ -22,7 +21,6 @@ include('../_include/Include.inc.php');
 header('Content-Type: text/html');
 
 $html = new CTemplate();
-$html->registerPlugin('function', 'md5_rand', 'smarty_function_md5_rand', false, null);
 
 $services = $db->query("SELECT * FROM service", "id");
 $html->assign('services', $services);
@@ -34,12 +32,11 @@ $consolidators = $db->query("SELECT * FROM consolidator", "id");
 $html->assign('consolidators', $consolidators);
 
 if ($_POST) {
-
   if (!isset($_POST['firstname']) || !preg_match('/^[A-Za-z]{2,}$/', $_POST['firstname'])) {
     die();
   }
 
-  if (!isset($_POST['surname']) || !preg_match('/^[[A-Za-z]{2,}$/', $_POST['surname'])) {
+  if (!isset($_POST['surname']) || !preg_match('/^[A-Za-z]{2,}$/', $_POST['surname'])) {
     die();
   }
 
@@ -47,7 +44,7 @@ if ($_POST) {
     die();
   }
 
-  if (!isset($_POST['mobile']) || !preg_match('/^0-9 .+/]{10,}$/', $_POST['mobile'])) {
+  if (!isset($_POST['mobile']) || !preg_match('/^[0-9 .+\/]{10,}$/', $_POST['mobile'])) {
     die();
   }
 
@@ -86,7 +83,7 @@ if ($_POST) {
   if (!isset($_POST['price']) || !preg_match('/^[0-9]{1,}$/', $_POST['price'])) {
     die();
   }
-  
+
   if (!isset($_POST['product']) || !preg_match('/^[A-Za-z ]{1,}$/', $_POST['product'])) {
     die();
   }
@@ -102,9 +99,9 @@ if ($_POST) {
   if (!isset($_POST['airportID']) || intval($_POST['airportID']) == 0) {
     die();
   }
-  
-  $db->query("INSERT INTO report (name, surname, email, mobile, typeID, consolidatorID, airportID, leavingDate, returnDate, price, carReg, carModel, carColour, returnFlightNum, terminal_out, terminal_in, refNum, product, notes) VALUES(
-                    '" . mysql_escape_string($_POST['name']) . "',
+
+  $db->query("INSERT INTO reports (firstname, surname, email, mobile, typeID, consolidatorID, airportID, leavingDate, returnDate, amountPaid, created, carReg, carModel, carColour, returnFlightNum, terminal_out, terminal_in, refNum, product, notes) VALUES(
+                    '" . mysql_escape_string($_POST['firstname']) . "',
                     '" . mysql_escape_string($_POST['surname']) . "',
                     '" . mysql_escape_string($_POST['email']) . "',
                     '" . mysql_escape_string($_POST['mobile']) . "',
@@ -113,6 +110,7 @@ if ($_POST) {
                     '" . mysql_escape_string($_POST['airportID']) . "',
                     '" . mysql_escape_string($_POST['leavingDate']) . "',
                     '" . mysql_escape_string($_POST['returnDate']) . "',
+                    '" . mysql_escape_string($_POST['price']) . "',
                     '" . mysql_escape_string($_POST['price']) . "',
                     '" . mysql_escape_string($_POST['carReg']) . "',
                     '" . mysql_escape_string($_POST['carModel']) . "',
@@ -125,12 +123,15 @@ if ($_POST) {
                     '" . mysql_escape_string($_POST['notes']) . "')");
 
   header('Location: /');
+
   die();
 }
 
-$html->tDisplay('add.tmpl', $session['language']);
-
-function smarty_function_md5_rand($params, &$smarty)
-{
-  return md5(rand());
+if (isset($_GET['report']) && intval($_GET['report']) > 0) {
+  $report = $db->query("SELECT * FROM reports WHERE id = '" . mysql_escape_string(intval($_GET['report'])) . "'");
+  if (is_array($report) && count($report)) {
+    $html->assign('report', $report[0]);
+  }
 }
+
+$html->tDisplay('add.tmpl', $session['language']);
