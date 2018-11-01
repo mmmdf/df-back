@@ -101,26 +101,26 @@ if ($_POST) {
   }
 
   $db->query("INSERT INTO reports (firstname, surname, email, mobile, typeID, consolidatorID, airportID, leavingDate, returnDate, amountPaid, created, carReg, carModel, carColour, returnFlightNum, terminal_out, terminal_in, refNum, product, notes) VALUES(
-                    '" . mysql_escape_string($_POST['firstname']) . "',
-                    '" . mysql_escape_string($_POST['surname']) . "',
-                    '" . mysql_escape_string($_POST['email']) . "',
-                    '" . mysql_escape_string($_POST['mobile']) . "',
-                    '" . mysql_escape_string($_POST['typeID']) . "',
-                    '" . mysql_escape_string($_POST['consolidatorID']) . "',
-                    '" . mysql_escape_string($_POST['airportID']) . "',
-                    '" . mysql_escape_string($_POST['leavingDate']) . "',
-                    '" . mysql_escape_string($_POST['returnDate']) . "',
-                    '" . mysql_escape_string($_POST['price']) . "',
-                    '" . mysql_escape_string($_POST['price']) . "',
-                    '" . mysql_escape_string($_POST['carReg']) . "',
-                    '" . mysql_escape_string($_POST['carModel']) . "',
-                    '" . mysql_escape_string($_POST['carColour']) . "',
-                    '" . mysql_escape_string($_POST['returnFlightNum']) . "',
-                    '" . mysql_escape_string($_POST['terminal_out']) . "',
-                    '" . mysql_escape_string($_POST['terminal_in']) . "',
-                    '" . mysql_escape_string($_POST['refNum']) . "',
-                    '" . mysql_escape_string($_POST['product']) . "',
-                    '" . mysql_escape_string($_POST['notes']) . "')");
+                    '" . $db->escape($_POST['firstname']) . "',
+                    '" . $db->escape($_POST['surname']) . "',
+                    '" . $db->escape($_POST['email']) . "',
+                    '" . $db->escape($_POST['mobile']) . "',
+                    '" . $db->escape($_POST['typeID']) . "',
+                    '" . $db->escape($_POST['consolidatorID']) . "',
+                    '" . $db->escape($_POST['airportID']) . "',
+                    '" . $db->escape($_POST['leavingDate']) . "',
+                    '" . $db->escape($_POST['returnDate']) . "',
+                    '" . $db->escape($_POST['price']) . "',
+                    '" . $db->escape($_POST['price']) . "',
+                    '" . $db->escape($_POST['carReg']) . "',
+                    '" . $db->escape($_POST['carModel']) . "',
+                    '" . $db->escape($_POST['carColour']) . "',
+                    '" . $db->escape($_POST['returnFlightNum']) . "',
+                    '" . $db->escape($_POST['terminal_out']) . "',
+                    '" . $db->escape($_POST['terminal_in']) . "',
+                    '" . $db->escape($_POST['refNum']) . "',
+                    '" . $db->escape($_POST['product']) . "',
+                    '" . $db->escape($_POST['notes']) . "')");
 
   header('Location: /');
 
@@ -128,7 +128,7 @@ if ($_POST) {
 }
 
 if (isset($_GET['report']) && intval($_GET['report']) > 0) {
-  $report = $db->query("SELECT * FROM reports WHERE id = '" . mysql_escape_string(intval($_GET['report'])) . "'");
+  $report = $db->query("SELECT * FROM reports WHERE id = '" . $db->escape(intval($_GET['report'])) . "'");
   if (is_array($report) && count($report)) {
     $html->assign('report', $report[0]);
   }

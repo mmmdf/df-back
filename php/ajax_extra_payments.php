@@ -22,10 +22,10 @@ header('Content-Type: application/json');
 
 $tmp0 = "WHERE 1 ";
 if (isset($_POST['service']) && intval($_POST['service']) > 0) {
-  $tmp0 .= "AND r.typeID = '" . mysql_escape_string(intval($_POST['service'])) . "' ";
+  $tmp0 .= "AND r.typeID = '" . $db->escape(intval($_POST['service'])) . "' ";
 }
 if (isset($_POST['airport']) && intval($_POST['airport']) > 0) {
-  $tmp0 .= "AND r.airportID = '" . mysql_escape_string(intval($_POST['airport'])) . "' ";
+  $tmp0 .= "AND r.airportID = '" . $db->escape(intval($_POST['airport'])) . "' ";
 }
 
 $payments = $db->query("SELECT ep.*, r.refNum AS _refNum FROM extra_payment AS ep

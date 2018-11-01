@@ -22,10 +22,10 @@ header('Content-Type: application/json');
 
 $tmp0 = "WHERE 1 ";
 if (isset($_POST['service']) && intval($_POST['service']) > 0) {
-  $tmp0 .= "AND r.typeID = '" . mysql_escape_string(intval($_POST['service'])) . "' ";
+  $tmp0 .= "AND r.typeID = '" . $db->escape(intval($_POST['service'])) . "' ";
 }
 if (isset($_POST['airport']) && intval($_POST['airport']) > 0) {
-  $tmp0 .= "AND r.airportID = '" . mysql_escape_string(intval($_POST['airport'])) . "' ";
+  $tmp0 .= "AND r.airportID = '" . $db->escape(intval($_POST['airport'])) . "' ";
 }
 
 $date = date('Y-m');
@@ -34,10 +34,10 @@ if (isset($_POST['date_year']) && isset($_POST['date_month']) && date('Y-m', str
 }
 
 $tmp1 = $db->query("SELECT 
-                      SUM(IF(SUBSTRING(r.leavingDate, 1, 7) = '" . mysql_escape_string($date) . "', 1, 0)) AS _out,
-                      SUM(IF(SUBSTRING(r.returnDate, 1, 7) = '" . mysql_escape_string($date) . "', 1, 0)) AS _in
+                      SUM(IF(SUBSTRING(r.leavingDate, 1, 7) = '" . $db->escape($date) . "', 1, 0)) AS _out,
+                      SUM(IF(SUBSTRING(r.returnDate, 1, 7) = '" . $db->escape($date) . "', 1, 0)) AS _in
                       FROM reports r
-                    " . $tmp0 . "AND (SUBSTRING(r.leavingDate, 1, 7) = '" . mysql_escape_string($date) . "' OR SUBSTRING(r.returnDate, 1, 7) = '" . mysql_escape_string($date) . "')");
+                    " . $tmp0 . "AND (SUBSTRING(r.leavingDate, 1, 7) = '" . $db->escape($date) . "' OR SUBSTRING(r.returnDate, 1, 7) = '" . $db->escape($date) . "')");
 
 if (!$tmp1[0]['_out']) {
   $tmp1[0]['_out'] = "0";
@@ -70,7 +70,7 @@ $tmp1 = $db->query("SELECT
                       FROM reports r
                     LEFT JOIN airport AS a ON a.id = r.airportID
                     LEFT JOIN consolidator AS c ON c.id = r.consolidatorID
-                    " . $tmp0 . "AND SUBSTRING(r.leavingDate, 1, 7) = '" . mysql_escape_string($date) . "'
+                    " . $tmp0 . "AND SUBSTRING(r.leavingDate, 1, 7) = '" . $db->escape($date) . "'
                     GROUP BY r.consolidatorID, _product");
 
 foreach ($tmp1 as $report) {

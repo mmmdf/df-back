@@ -56,7 +56,7 @@ if (!isset($_POST['terminal_out']) || !preg_match('/^[A-Za-z0-9]{1,}$/', $_POST[
   die();
 }
 
-$report = $db->query("SELECT * FROM reports r WHERE r.id = '" . mysql_escape_string($_POST['id']) . "'");
+$report = $db->query("SELECT * FROM reports r WHERE r.id = '" . $db->escape($_POST['id']) . "'");
 if (!is_array($report) || !count($report)) {
   die();
 }
@@ -86,20 +86,20 @@ foreach ($auditTrailFields as $auditTrailFieldIndex => $auditTrailFieldValue) {
 }
 
 if (count($auditTrailResult)) {
-  $db->query("INSERT INTO audit_trail (report, record) VALUES ('" . mysql_escape_string($_POST['id']) . "', '" . mysql_escape_string(json_encode($auditTrailResult, JSON_PRETTY_PRINT)) . "')");
+  $db->query("INSERT INTO audit_trail (report, record) VALUES ('" . $db->escape($_POST['id']) . "', '" . $db->escape(json_encode($auditTrailResult, JSON_PRETTY_PRINT)) . "')");
 }
 
 $db->query("UPDATE reports
             SET
-              leavingDate = '" . mysql_escape_string($_POST['leavingDate']) . "',
-              returnDate = '" . mysql_escape_string($_POST['returnDate']) . "',
-              carModel = '" . mysql_escape_string($_POST['carModel']) . "',
-              carColour = '" . mysql_escape_string($_POST['carColour']) . "',
-              carReg = '" . mysql_escape_string($_POST['carReg']) . "',
-              returnFlightNum = '" . mysql_escape_string($_POST['returnFlightNum']) . "',
-              terminal_in = '" . mysql_escape_string($_POST['terminal_in']) . "',
-              terminal_out = '" . mysql_escape_string($_POST['terminal_out']) . "',
-              notes = '" . mysql_escape_string($_POST['notes']) . "'
-            WHERE id = '" . mysql_escape_string($_POST['id']) . "'");
+              leavingDate = '" . $db->escape($_POST['leavingDate']) . "',
+              returnDate = '" . $db->escape($_POST['returnDate']) . "',
+              carModel = '" . $db->escape($_POST['carModel']) . "',
+              carColour = '" . $db->escape($_POST['carColour']) . "',
+              carReg = '" . $db->escape($_POST['carReg']) . "',
+              returnFlightNum = '" . $db->escape($_POST['returnFlightNum']) . "',
+              terminal_in = '" . $db->escape($_POST['terminal_in']) . "',
+              terminal_out = '" . $db->escape($_POST['terminal_out']) . "',
+              notes = '" . $db->escape($_POST['notes']) . "'
+            WHERE id = '" . $db->escape($_POST['id']) . "'");
 
 echo json_encode(array('result' => 'OK'), JSON_PRETTY_PRINT);

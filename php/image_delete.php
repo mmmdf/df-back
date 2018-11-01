@@ -25,12 +25,12 @@ if (!isset($_POST['id']) || intval($_POST['id']) == 0 || intval($_POST['id']) !=
   die();
 }
 
-$image = $db->query("SELECT * FROM image WHERE id = '" . mysql_escape_string($_POST['id']) . "'");
+$image = $db->query("SELECT * FROM image WHERE id = '" . $db->escape($_POST['id']) . "'");
 if (is_array($image) && count($image)) {
   unlink('data/images/image_reports_' . $image[0]['name'] .'.jpg');
   unlink('data/images/image_reports_' . $image[0]['name'] .'-original.jpg');
 
-  $db->query("DELETE FROM image WHERE id = '" . mysql_escape_string($_POST['id']) . "'");
+  $db->query("DELETE FROM image WHERE id = '" . $db->escape($_POST['id']) . "'");
 }
 
 echo json_encode(array(), JSON_PRETTY_PRINT);

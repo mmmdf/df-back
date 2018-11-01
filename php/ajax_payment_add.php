@@ -32,19 +32,19 @@ if (!isset($_POST['amount']) || intval($_POST['amount']) <= 0 || intval($_POST['
   die();
 }
 
-$report = $db->query("SELECT * FROM reports r WHERE r.id = '" . mysql_escape_string($_POST['report']) . "'");
+$report = $db->query("SELECT * FROM reports r WHERE r.id = '" . $db->escape($_POST['report']) . "'");
 if (!is_array($report) || !count($report)) {
   die();
 }
 
 $db->query("INSERT INTO extra_payment (report, `for`, amount, status)
             VALUES(
-              '" . mysql_escape_string($_POST['report']) . "',
-              '" . mysql_escape_string($_POST['for']) . "',
-              '" . mysql_escape_string($_POST['amount']) . "',
+              '" . $db->escape($_POST['report']) . "',
+              '" . $db->escape($_POST['for']) . "',
+              '" . $db->escape($_POST['amount']) . "',
               'OK'
             )");
 
-$payment = $db->query("SELECT * FROM extra_payment WHERE id = '" . mysql_escape_string(mysql_insert_id()) . "'");
+$payment = $db->query("SELECT * FROM extra_payment WHERE id = '" . $db->escape(mysql_insert_id()) . "'");
 
 echo json_encode(array('result' => 'OK', 'payment' => $payment[0]), JSON_PRETTY_PRINT);

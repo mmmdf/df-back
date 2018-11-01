@@ -18,6 +18,7 @@
  *   - [2008.10.06] - Andrei Gavrila - Small optimizations
  *   - [2011.02.13] - Andrei Gavrila - Removed warning in port detection
  *   - [2011.02.13] - Andrei Gavrila - Upgrade to PHP5 class style (constructor)
+ *   - [2018.10.01] - Andrei Gavrila - Updated to mysqli
  *   - []
  */
 
@@ -106,7 +107,7 @@ class CmySQL {
    */
 
   function checkmySQL() {
-    return function_exists('mysql_connect');
+    return function_exists('mysqli_connect');
   }
 
   /*
@@ -119,7 +120,7 @@ class CmySQL {
      */
 
     if ($this->dbLink) {
-      @mysql_close($this->dbLink);
+      @mysqli_close($this->dbLink);
     }
 
     /*
@@ -127,9 +128,9 @@ class CmySQL {
      */
 
     if (empty($this->dbPort)) {
-      $this->dbLink = @mysql_connect($this->dbHost, $this->dbUser, $this->dbPass);
+      $this->dbLink = @mysqli_connect($this->dbHost, $this->dbUser, $this->dbPass);
     } else {
-      $this->dbLink = @mysql_connect($this->dbHost . ':' . $this->dbPort, $this->dbUser, $this->dbPass);
+      $this->dbLink = @mysqli_connect($this->dbHost . ':' . $this->dbPort, $this->dbUser, $this->dbPass);
     }
 
     return $this->dbLink;
@@ -141,7 +142,7 @@ class CmySQL {
 
   function select() {
     if ($this->dbLink) {
-      if (@mysql_select_db($this->dbName, $this->dbLink)) {
+      if (@mysqli_select_db($this->dbLink, $this->dbName)) {
         return true;
       } else {
         return false;
@@ -162,16 +163,16 @@ class CmySQL {
        */
 
       if ($this->dbResult) {
-        @mysql_free_result($this->dbResult);
+        @mysqli_free_result($this->dbResult);
       }
 
-      $this->dbResult = @mysql_query($szQuery, $this->dbLink);
+      $this->dbResult = @mysqli_query($this->dbLink, $szQuery);
 
       /*
        * Test to see if the link broke down
        */
 
-      if (mysql_errno() == 1001) {
+      if (mysqli_errno($this->dbLink) == 1001) {
         /*
          * Connect to mySQL server
          */
@@ -192,7 +193,7 @@ class CmySQL {
           return false;
         }
 
-        $this->dbResult = @mysql_query($szQuery, $this->dbLink);
+        $this->dbResult = @mysqli_query($this->dbLink, $szQuery);
       }
 
       if (!$this->dbResult) {
@@ -206,8 +207,8 @@ class CmySQL {
        */
 
       $this->dbArray = array();
-      if (@mysql_num_rows($this->dbResult) > 0) {
-        while ($entry = @mysql_fetch_array($this->dbResult, MYSQL_ASSOC)) {
+      if (@mysqli_num_rows($this->dbResult) > 0) {
+        while ($entry = @mysqli_fetch_array($this->dbResult, MYSQL_ASSOC)) {
           if (!empty($szIndex)) {
             $this->dbArray[$entry[$szIndex]] = $entry;
           } else {
@@ -231,13 +232,21 @@ class CmySQL {
   function error($szMessage) {
     $szMsg = $this->szErrorFormat;
     $szMsg = str_replace('__MESSAGE__', $szMessage, $szMsg);
-    $szMsg = str_replace('__MYSQLERROR__', mysql_error(), $szMsg);
-    $szMsg = str_replace('__MYSQLERRNO__', mysql_errno(), $szMsg);
+    $szMsg = str_replace('__MYSQLERROR__', mysqli_error($this->dbLink), $szMsg);
+    $szMsg = str_replace('__MYSQLERRNO__', mysqli_errno($this->dbLink), $szMsg);
 
     if ($this->bFatalError) {
       die($szMsg);
     } else {
       echo $szMsg;
     }
+  }
+
+  /*
+   *
+   */
+
+  function escape($string) {
+    return mysqli_escape_string($this->dbLink, $string);
   }
 }

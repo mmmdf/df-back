@@ -25,12 +25,12 @@ $reports = $db->query("SELECT r.*, s.name AS _type_name, s.acronym AS _type_acro
 					   INNER JOIN service s ON s.id = r.typeID
 					   INNER JOIN airport a ON a.id = r.airportID
 					   INNER JOIN consolidator c ON c.id = r.consolidatorID
-					   WHERE r.id LIKE '%" . mysql_escape_string($_POST['search']). "%' OR 
-					       r.refNum LIKE '%" . mysql_escape_string($_POST['search']). "%' OR
-					       r.firstname LIKE '%" . mysql_escape_string($_POST['search']). "%' OR
-					       r.surname LIKE '%" . mysql_escape_string($_POST['search']). "%' OR
-					       r.mobile LIKE '%" . mysql_escape_string($_POST['search']). "%' OR
-					       r.carReg LIKE '%" . mysql_escape_string($_POST['search']). "%'
+					   WHERE r.id LIKE '%" . $db->escape($_POST['search']). "%' OR 
+					       r.refNum LIKE '%" . $db->escape($_POST['search']). "%' OR
+					       r.firstname LIKE '%" . $db->escape($_POST['search']). "%' OR
+					       r.surname LIKE '%" . $db->escape($_POST['search']). "%' OR
+					       r.mobile LIKE '%" . $db->escape($_POST['search']). "%' OR
+					       r.carReg LIKE '%" . $db->escape($_POST['search']). "%'
 					   ORDER BY r.created DESC LIMIT 0, 50", "id");
 foreach ($reports as $reportIndex => $reportItem) {
   $reports[$reportIndex]['_created_relative'] = relativeTime(strtotime($reportItem['created']));

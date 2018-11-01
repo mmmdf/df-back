@@ -27,6 +27,6 @@ if (!isset($_POST['id']) || intval($_POST['id']) == 0 || intval($_POST['id']) !=
 $db->query("UPDATE extra_payment
             SET
               status = 'Paid'
-            WHERE id = '" . mysql_escape_string($_POST['id']) . "'");
+            WHERE id = '" . $db->escape($_POST['id']) . "'");
 
 echo json_encode(array('result' => 'OK', 'status' => 'Paid'), JSON_PRETTY_PRINT);

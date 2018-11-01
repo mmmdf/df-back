@@ -22,10 +22,10 @@ header('Content-Type: application/json');
 
 $tmp0 = "WHERE 1 ";
 if (isset($_POST['service']) && intval($_POST['service']) > 0) {
-  $tmp0 .= "AND r.typeID = '" . mysql_escape_string(intval($_POST['service'])) . "' ";
+  $tmp0 .= "AND r.typeID = '" . $db->escape(intval($_POST['service'])) . "' ";
 }
 if (isset($_POST['airport']) && intval($_POST['airport']) > 0) {
-  $tmp0 .= "AND r.airportID = '" . mysql_escape_string(intval($_POST['airport'])) . "' ";
+  $tmp0 .= "AND r.airportID = '" . $db->escape(intval($_POST['airport'])) . "' ";
 }
 
 $dateFrom = date('Y-m-d');
@@ -56,7 +56,7 @@ while ($date <= $dateTo && $count < 14) {
   $tmp1 = $db->query("SELECT 
                         r.consolidatorID, COUNT(r.id) AS _total
                         FROM reports r
-                      " . $tmp0 . "AND DATE(r.leavingDate) = '" . mysql_escape_string($date) . "'
+                      " . $tmp0 . "AND DATE(r.leavingDate) = '" . $db->escape($date) . "'
                       GROUP BY r.consolidatorID");
 
   foreach ($data as $dataKey => $dataItem) {

@@ -40,9 +40,9 @@ if ($_FILES) {
     $imageResizer->save('data/images/image_reports_' . $image_name .'-original.jpg', IMAGETYPE_JPEG, 100);
 
     $db->query("INSERT INTO image (report, name, size) VALUES (
-                  '" . mysql_escape_string($_POST['report']) . "',
-                  '" . mysql_escape_string($image_name) . "',
-                  '" . mysql_escape_string(filesize('data/images/image_reports_' . $image_name . '.jpg')) . "'
+                  '" . $db->escape($_POST['report']) . "',
+                  '" . $db->escape($image_name) . "',
+                  '" . $db->escape(filesize('data/images/image_reports_' . $image_name . '.jpg')) . "'
                 )");
 
     echo json_encode(array(), JSON_PRETTY_PRINT);
@@ -52,7 +52,7 @@ if ($_FILES) {
     die();
   }
 
-  $images = $db->query("SELECT id, CONCAT('image_reports_', name, '.jpg') AS name, report AS reportId, size FROM image WHERE report = '" . mysql_escape_string($_GET['report']) . "'");
+  $images = $db->query("SELECT id, CONCAT('image_reports_', name, '.jpg') AS name, report AS reportId, size FROM image WHERE report = '" . $db->escape($_GET['report']) . "'");
 
   echo json_encode($images, JSON_PRETTY_PRINT);
 }

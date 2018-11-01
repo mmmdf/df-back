@@ -28,16 +28,16 @@ $consolidators = $db->query("SELECT * FROM consolidator", "id");
 
 $tmp0 = "WHERE 1 ";
 if (isset($_POST['service']) && intval($_POST['service']) > 0) {
-  $tmp0 .= "AND r.typeID = '" . mysql_escape_string(intval($_POST['service'])) . "' ";
+  $tmp0 .= "AND r.typeID = '" . $db->escape(intval($_POST['service'])) . "' ";
 }
 if (isset($_POST['airport']) && intval($_POST['airport']) > 0) {
-  $tmp0 .= "AND r.airportID = '" . mysql_escape_string(intval($_POST['airport'])) . "' ";
+  $tmp0 .= "AND r.airportID = '" . $db->escape(intval($_POST['airport'])) . "' ";
 }
 if (isset($_POST['consolidator']) && intval($_POST['consolidator']) > 0) {
-  $tmp0 .= "AND r.consolidatorID = '" . mysql_escape_string(intval($_POST['consolidator'])) . "' ";
+  $tmp0 .= "AND r.consolidatorID = '" . $db->escape(intval($_POST['consolidator'])) . "' ";
 }
 if (isset($_POST['date']) && date('Y-m-d', strtotime($_POST['date'])) ==  $_POST['date']) {
-  $tmp0 .= "AND (r.leavingDate LIKE '" . mysql_escape_string($_POST['date']) . "%' OR r.returnDate LIKE '" . mysql_escape_string($_POST['date']) . "%')";
+  $tmp0 .= "AND (r.leavingDate LIKE '" . $db->escape($_POST['date']) . "%' OR r.returnDate LIKE '" . $db->escape($_POST['date']) . "%')";
 }
 if (isset($_POST['terminal']) && intval($_POST['terminal']) > 0) {
   $tmp0 .= "AND (r.terminal_in IS NULL OR r.terminal_out IS NULL)";

@@ -25,6 +25,6 @@ if (!isset($_POST['id']) || intval($_POST['id']) == 0 || intval($_POST['id']) !=
 }
 
 $db->query("DELETE FROM extra_payment
-            WHERE id = '" . mysql_escape_string($_POST['id']) . "'");
+            WHERE id = '" . $db->escape($_POST['id']) . "'");
 
 echo json_encode(array('result' => 'OK'), JSON_PRETTY_PRINT);
