@@ -1,0 +1,61 @@
+[31-Oct-2018 18:24:40 Europe/Bucharest] PHP Warning:  include(../_include/Include.inc.php): failed to open stream: No such file or directory in /home/tersian/public_html/drivefly.creativefish.ro/php/api/print/pdf.slip.php on line 15
+[31-Oct-2018 18:24:40 Europe/Bucharest] PHP Warning:  include(): Failed opening '../_include/Include.inc.php' for inclusion (include_path='.:/usr/lib/php:/usr/local/lib/php') in /home/tersian/public_html/drivefly.creativefish.ro/php/api/print/pdf.slip.php on line 15
+[31-Oct-2018 18:24:40 Europe/Bucharest] PHP Fatal error:  Call to a member function query() on a non-object in /home/tersian/public_html/drivefly.creativefish.ro/php/api/print/pdf.slip.php on line 40
+[31-Oct-2018 18:46:22 Europe/Bucharest] PHP Fatal error:  Class 'PDF' not found in /home/tersian/public_html/drivefly.creativefish.ro/php/api/print/pdf.slip.php on line 64
+[31-Oct-2018 18:46:42 Europe/Bucharest] PHP Fatal error:  Class 'PDF' not found in /home/tersian/public_html/drivefly.creativefish.ro/php/api/print/pdf.slip.php on line 64
+[31-Oct-2018 18:46:45 Europe/Bucharest] PHP Fatal error:  Class 'PDF' not found in /home/tersian/public_html/drivefly.creativefish.ro/php/api/print/pdf.slip.php on line 64
+[31-Oct-2018 18:54:24 Europe/Bucharest] PHP Fatal error:  Class 'PDF' not found in /home/tersian/public_html/drivefly.creativefish.ro/php/api/print/pdf.slip.php on line 64
+[31-Oct-2018 18:54:27 Europe/Bucharest] PHP Fatal error:  Class 'PDF' not found in /home/tersian/public_html/drivefly.creativefish.ro/php/api/print/pdf.slip.php on line 64
+[31-Oct-2018 18:54:43 Europe/Bucharest] PHP Fatal error:  Class 'PDF' not found in /home/tersian/public_html/drivefly.creativefish.ro/php/api/print/pdf.slip.php on line 64
+[31-Oct-2018 18:54:45 Europe/Bucharest] PHP Fatal error:  Class 'PDF' not found in /home/tersian/public_html/drivefly.creativefish.ro/php/api/print/pdf.slip.php on line 64
+[31-Oct-2018 18:54:47 Europe/Bucharest] PHP Fatal error:  Class 'PDF' not found in /home/tersian/public_html/drivefly.creativefish.ro/php/api/print/pdf.slip.php on line 64
+[31-Oct-2018 18:55:02 Europe/Bucharest] PHP Fatal error:  Class 'PDF' not found in /home/tersian/public_html/drivefly.creativefish.ro/php/api/print/pdf.slip.php on line 64
+[31-Oct-2018 18:55:03 Europe/Bucharest] PHP Fatal error:  Class 'PDF' not found in /home/tersian/public_html/drivefly.creativefish.ro/php/api/print/pdf.slip.php on line 64
+[31-Oct-2018 18:55:03 Europe/Bucharest] PHP Fatal error:  Class 'PDF' not found in /home/tersian/public_html/drivefly.creativefish.ro/php/api/print/pdf.slip.php on line 64
+[31-Oct-2018 18:55:03 Europe/Bucharest] PHP Fatal error:  Class 'PDF' not found in /home/tersian/public_html/drivefly.creativefish.ro/php/api/print/pdf.slip.php on line 64
+[31-Oct-2018 18:55:25 Europe/Bucharest] PHP Fatal error:  Class 'PDF' not found in /home/tersian/public_html/drivefly.creativefish.ro/php/api/print/pdf.slip.php on line 64
+[31-Oct-2018 18:55:53 Europe/Bucharest] PHP Fatal error:  Using $this when not in object context in /home/tersian/public_html/drivefly.creativefish.ro/php/api/print/pdf.slip.php on line 70
+[31-Oct-2018 19:42:12 Europe/Bucharest] PHP Notice:  Undefined index: carColor in /home/tersian/public_html/drivefly.creativefish.ro/php/api/print/pdf.slip.php on line 84
+[31-Oct-2018 19:42:12 Europe/Bucharest] PHP Fatal error:  Uncaught exception 'Exception' with message 'FPDF error: Some data has already been output, can't send PDF file (output started at /home/tersian/public_html/drivefly.creativefish.ro/php/api/print/pdf.slip.php:84)' in /home/tersian/public_html/drivefly.creativefish.ro/_include/fpdf181/fpdf.php:271
+Stack trace:
+#0 /home/tersian/public_html/drivefly.creativefish.ro/_include/fpdf181/fpdf.php(1052): FPDF->Error('Some data has a...')
+#1 /home/tersian/public_html/drivefly.creativefish.ro/_include/fpdf181/fpdf.php(999): FPDF->_checkoutput()
+#2 /home/tersian/public_html/drivefly.creativefish.ro/php/api/print/pdf.slip.php(97): FPDF->Output()
+#3 {main}
+  thrown in /home/tersian/public_html/drivefly.creativefish.ro/_include/fpdf181/fpdf.php on line 271
+[31-Oct-2018 19:42:12 Europe/Bucharest] PHP Notice:  Undefined index: carColor in /home/tersian/public_html/drivefly.creativefish.ro/php/api/print/pdf.slip.php on line 84
+[31-Oct-2018 19:42:12 Europe/Bucharest] PHP Fatal error:  Uncaught exception 'Exception' with message 'FPDF error: Some data has already been output, can't send PDF file (output started at /home/tersian/public_html/drivefly.creativefish.ro/php/api/print/pdf.slip.php:84)' in /home/tersian/public_html/drivefly.creativefish.ro/_include/fpdf181/fpdf.php:271
+Stack trace:
+#0 /home/tersian/public_html/drivefly.creativefish.ro/_include/fpdf181/fpdf.php(1052): FPDF->Error('Some data has a...')
+#1 /home/tersian/public_html/drivefly.creativefish.ro/_include/fpdf181/fpdf.php(999): FPDF->_checkoutput()
+#2 /home/tersian/public_html/drivefly.creativefish.ro/php/api/print/pdf.slip.php(97): FPDF->Output()
+#3 {main}
+  thrown in /home/tersian/public_html/drivefly.creativefish.ro/_include/fpdf181/fpdf.php on line 271
+[31-Oct-2018 20:03:32 Europe/Bucharest] PHP Notice:  Undefined index: _leavingDate_formatted_dd_mm_yyyy in /home/tersian/public_html/drivefly.creativefish.ro/php/api/print/pdf.slip.php on line 96
+[31-Oct-2018 20:03:32 Europe/Bucharest] PHP Fatal error:  Uncaught exception 'Exception' with message 'FPDF error: Some data has already been output, can't send PDF file (output started at /home/tersian/public_html/drivefly.creativefish.ro/php/api/print/pdf.slip.php:96)' in /home/tersian/public_html/drivefly.creativefish.ro/_include/fpdf181/fpdf.php:271
+Stack trace:
+#0 /home/tersian/public_html/drivefly.creativefish.ro/_include/fpdf181/fpdf.php(1052): FPDF->Error('Some data has a...')
+#1 /home/tersian/public_html/drivefly.creativefish.ro/_include/fpdf181/fpdf.php(999): FPDF->_checkoutput()
+#2 /home/tersian/public_html/drivefly.creativefish.ro/php/api/print/pdf.slip.php(130): FPDF->Output()
+#3 {main}
+  thrown in /home/tersian/public_html/drivefly.creativefish.ro/_include/fpdf181/fpdf.php on line 271
+[31-Oct-2018 20:03:32 Europe/Bucharest] PHP Notice:  Undefined index: _leavingDate_formatted_dd_mm_yyyy in /home/tersian/public_html/drivefly.creativefish.ro/php/api/print/pdf.slip.php on line 96
+[31-Oct-2018 20:03:32 Europe/Bucharest] PHP Fatal error:  Uncaught exception 'Exception' with message 'FPDF error: Some data has already been output, can't send PDF file (output started at /home/tersian/public_html/drivefly.creativefish.ro/php/api/print/pdf.slip.php:96)' in /home/tersian/public_html/drivefly.creativefish.ro/_include/fpdf181/fpdf.php:271
+Stack trace:
+#0 /home/tersian/public_html/drivefly.creativefish.ro/_include/fpdf181/fpdf.php(1052): FPDF->Error('Some data has a...')
+#1 /home/tersian/public_html/drivefly.creativefish.ro/_include/fpdf181/fpdf.php(999): FPDF->_checkoutput()
+#2 /home/tersian/public_html/drivefly.creativefish.ro/php/api/print/pdf.slip.php(130): FPDF->Output()
+#3 {main}
+  thrown in /home/tersian/public_html/drivefly.creativefish.ro/_include/fpdf181/fpdf.php on line 271
+[31-Oct-2018 20:31:48 Europe/Bucharest] PHP Notice:  Undefined variable: pdf in /home/tersian/public_html/drivefly.creativefish.ro/php/api/print/pdf.slip.php on line 73
+[31-Oct-2018 20:31:48 Europe/Bucharest] PHP Fatal error:  Call to a member function GetPageWidth() on a non-object in /home/tersian/public_html/drivefly.creativefish.ro/php/api/print/pdf.slip.php on line 73
+[31-Oct-2018 20:31:48 Europe/Bucharest] PHP Notice:  Undefined variable: pdf in /home/tersian/public_html/drivefly.creativefish.ro/php/api/print/pdf.slip.php on line 73
+[31-Oct-2018 20:31:48 Europe/Bucharest] PHP Fatal error:  Call to a member function GetPageWidth() on a non-object in /home/tersian/public_html/drivefly.creativefish.ro/php/api/print/pdf.slip.php on line 73
+[31-Oct-2018 20:32:55 Europe/Bucharest] PHP Notice:  Undefined variable: pdf in /home/tersian/public_html/drivefly.creativefish.ro/php/api/print/pdf.slip.php on line 73
+[31-Oct-2018 20:32:55 Europe/Bucharest] PHP Fatal error:  Call to a member function GetPageWidth() on a non-object in /home/tersian/public_html/drivefly.creativefish.ro/php/api/print/pdf.slip.php on line 73
+[31-Oct-2018 20:32:55 Europe/Bucharest] PHP Notice:  Undefined variable: pdf in /home/tersian/public_html/drivefly.creativefish.ro/php/api/print/pdf.slip.php on line 73
+[31-Oct-2018 20:32:55 Europe/Bucharest] PHP Fatal error:  Call to a member function GetPageWidth() on a non-object in /home/tersian/public_html/drivefly.creativefish.ro/php/api/print/pdf.slip.php on line 73
+[31-Oct-2018 20:33:32 Europe/Bucharest] PHP Notice:  Undefined variable: pdf in /home/tersian/public_html/drivefly.creativefish.ro/php/api/print/pdf.slip.php on line 73
+[31-Oct-2018 20:33:32 Europe/Bucharest] PHP Fatal error:  Call to a member function GetPageWidth() on a non-object in /home/tersian/public_html/drivefly.creativefish.ro/php/api/print/pdf.slip.php on line 73
+[31-Oct-2018 20:58:59 Europe/Bucharest] PHP Fatal error:  Cannot access protected property FPDF::$w in /home/tersian/public_html/drivefly.creativefish.ro/php/api/print/pdf.slip.php on line 175
+[31-Oct-2018 20:59:00 Europe/Bucharest] PHP Fatal error:  Cannot access protected property FPDF::$w in /home/tersian/public_html/drivefly.creativefish.ro/php/api/print/pdf.slip.php on line 175

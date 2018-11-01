@@ -9,6 +9,18 @@ request = {
 
 function refresh()
 {
+  var supa_magic_date = moment(request['date']);
+  var diff = supa_magic_date.diff(moment().hours(0).minutes(0).seconds(0).milliseconds(0), 'days');
+  var supa_magic_date_addon = '';
+  if (diff == 0) {
+    supa_magic_date_addon = ' (Today)';
+  } else if (diff == 1) {
+    supa_magic_date_addon = ' (Tomorrow)';
+  } else if (diff == -1) {
+    supa_magic_date_addon = ' (Yesterday)'; // all my troubles seemed so far away...
+  }
+  $('.supa_magic_date').html(supa_magic_date.format('ddd MMM D YYYY') + supa_magic_date_addon);
+
   $('.list_container').html($('.loader_container').html());
 
   $.ajax({
@@ -122,6 +134,12 @@ function refresh()
 
     listLeaving.find('.data_count').html(listLeaving.children().length - 1);
     listReturn.find('.data_count').html(listReturn.children().length - 1);
+
+    $('.list_container .supa_magic_link').each(function(index, element) {
+      for (var property in request) {
+        $(element).attr('href', $(element).attr('href').replace('__' + property.toUpperCase() + '__', request[property]));
+      }
+    });
   });
 }
 
@@ -255,7 +273,7 @@ $(document).ready(function() {
     </div>
     <div class="row pb-3">
       <div class="offset-md-3 col-md-6 d-flex justify-content-md-center">
-        <h2><script> document.write(new Date().toDateString()); </script> (Today)</h2>
+        <h2 class="supa_magic_date"><script> document.write(new Date().toDateString()); </script> (Today)</h2>
       </div>
       <div class="col-md-3 d-flex justify-content-md-end">
         <button type="button" class="btn btn-primary">Print AM/PM</button>
@@ -648,7 +666,7 @@ $(document).ready(function() {
   <div class="col-md-6">
     <div class="row mx-0 pb-2 text-muted border-bottom">
       <div class="col-md-6 data_count">403</div>
-      <div class="col-md-6 d-flex justify-content-md-end"><a href="api/print/pdf.slip.php?date=2018-08-27&amp;airport=0&amp;type=" target="_blank" class="btn btn-primary btn-sm pull-right mr-2">Print</a> <a href="api/print/pdf.slip.returns.php?date=2018-08-27&amp;airport=0&amp;type=&amp;in=1" target="_blank" class="btn btn-primary btn-sm">List</a></div>
+      <div class="col-md-6 d-flex justify-content-md-end"><a href="api/print/pdf.slip.php?date=__DATE__&airport=__AIRPORT__&type=__SERVICE__" target="_blank" class="btn btn-primary btn-sm pull-right mr-2 supa_magic_link">Print</a> <a href="api/print/pdf.slip.returns.php?date=__DATE__&airport=__AIRPORT__&type=__SERVICE__&in=1" target="_blank" class="btn btn-primary btn-sm supa_magic_link">List</a></div>
     </div>
   </div>
 </div>
@@ -657,7 +675,7 @@ $(document).ready(function() {
   <div class="col-md-6">
     <div class="row mx-0 pb-2 text-muted border-bottom">
       <div class="col-md-6 data_count">743</div>
-      <div class="col-md-6 d-flex justify-content-md-end"><a href="api/print/pdf.slip.returns.php?date=2018-08-27&amp;airport=0&amp;type=&amp;in=1" target="_blank" class="btn btn-primary btn-sm">List</a></div>
+      <div class="col-md-6 d-flex justify-content-md-end"><a href="api/print/pdf.slip.returns.php?date=__DATE__&airport=__AIRPORT__&type=__SERVICE__&in=1" target="_blank" class="btn btn-primary btn-sm supa_magic_link">List</a></div>
     </div>
   </div>
 </div>
