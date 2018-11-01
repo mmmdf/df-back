@@ -126,8 +126,8 @@ foreach ($reports as $report) {
 
   $fpdf->SetFont('Arial', '', 16);
   $fpdf->SetY(100);
-  $fpdf->SetX(210);
-  $fpdf->MultiCell(80, 16, $report['refNum']);
+  $fpdf->SetX(195);
+  $fpdf->MultiCell(90, 16, $report['refNum']);
 
   $fpdf->SetFont('Arial', '', 16);
   $fpdf->SetY(100);
